@@ -4,8 +4,7 @@
 using namespace std;
 
 int main(){
-	cout << "Hello world!!!";
-	socketHelper prueba(12345, true);
+	socketHelper prueba(true);
 	prueba.sh_bind();
 	prueba.sh_listen();
 	prueba.sh_accept();

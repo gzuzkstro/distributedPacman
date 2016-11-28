@@ -5,7 +5,7 @@ using namespace std;
 
 int main(){
 	
-	socketHelper prueba(12345,"127.0.0.1",true);
+	socketHelper prueba("127.0.0.1",true);
 	prueba.sh_connect();
 	
 	//Send some data

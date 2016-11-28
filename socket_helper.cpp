@@ -1,12 +1,12 @@
 #include "socket_helper.h"
 
 //Constructor for a server socket
-socketHelper::socketHelper(int port, bool protocol){
+//type: true(TCP), false(UDP)
+socketHelper::socketHelper(bool protocol){
 	
 	type = protocol;
 	
 	//Creates socket based on type parameter
-	// true: TCP, false: UDP
 	if(type){
 		socket_desc = socket(AF_INET, SOCK_STREAM , 0);
 	} else {
@@ -22,12 +22,18 @@ socketHelper::socketHelper(int port, bool protocol){
     
     //Prepares the sockaddr_in structure
     server.sin_family = AF_INET;
-    server.sin_addr.s_addr = INADDR_ANY;
-    server.sin_port = htons(port);
+    
+    if(type){
+		server.sin_addr.s_addr = INADDR_ANY;
+	} else {
+		server.sin_addr.s_addr = inet_addr(PAC_GROUP);
+	}
+	
+    server.sin_port = htons(PAC_PORT);
 }
 
 //Constructor for a client socket
-socketHelper::socketHelper(int port,const char *ipaddress, bool protocol){
+socketHelper::socketHelper(const char *ipaddress, bool protocol){
 	
 	type = protocol;
 	
@@ -49,7 +55,7 @@ socketHelper::socketHelper(int port,const char *ipaddress, bool protocol){
     //Prepares the sockaddr_in structure
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = inet_addr(ipaddress);
-    server.sin_port = htons(port);
+    server.sin_port = htons(PAC_PORT);
 }
 
 int socketHelper::sh_bind(){
@@ -66,8 +72,10 @@ int socketHelper::sh_bind(){
 }
 
 void socketHelper::sh_listen(){
+	
 	//Listen
-    listen(socket_desc , 3);
+    listen(socket_desc , NUM_CONN);
+
 }
 
 int socketHelper::sh_accept(){
@@ -118,6 +126,31 @@ int socketHelper::sh_connect() {
      
     cout << "Connected" << endl;
     return 0;
+}
+
+int socketHelper::sh_setGroup(){
+	
+	mreq.imr_multiaddr.s_addr=inet_addr(PAC_GROUP);
+	mreq.imr_interface.s_addr=htonl(INADDR_ANY);
+	if (setsockopt(socket_desc,IPPROTO_IP,IP_ADD_MEMBERSHIP,&mreq,sizeof(mreq)) < 0) {
+		cout << "Error in setsockopt" << endl;
+		exit(1);
+	}
+	
+	return 0;
+}
+
+int socketHelper::sh_udpLoop(){
+	/* now just enter a read-print loop */
+     while (1) {
+	  addrlen=sizeof(server);
+	  if ((nbytes=recvfrom(socket_desc,msgbuf,MSGBUFSIZE,0,
+			(struct sockaddr *) &server,&addrlen)) < 0) {
+			cout << "recvfrom" << endl;
+	       exit(1);
+	  }
+	  cout << message << endl;
+     }
 }
 
 /*
