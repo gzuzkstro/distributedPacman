@@ -27,13 +27,15 @@ class socketHelper {
 		int new_socket;
 		int *new_sock;
 		int c;
-		char const *message;
+		const char *message;
 		
-		socketHelper(int port, bool type);
+		socketHelper(int port, bool protocol);
+		socketHelper(int port, const char *ipaddress, bool protocol);
 		
 		int sh_bind();
 		void sh_listen();
 		int sh_accept();
+		int sh_connect();
 };
  
 void *connection_handler(void *);
