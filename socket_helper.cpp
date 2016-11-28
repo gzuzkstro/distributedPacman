@@ -75,7 +75,6 @@ void socketHelper::sh_listen(){
 	
 	//Listen
     listen(socket_desc , NUM_CONN);
-
 }
 
 int socketHelper::sh_accept(){

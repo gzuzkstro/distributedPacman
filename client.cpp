@@ -3,8 +3,20 @@
 
 using namespace std;
 
-int main(){
+int main(int argc, char** argv){
 	
+	const char *ip_param;
+	
+	//If there were no arguments, defaults to localhost
+	if(argc >= 2){
+		ip_param = argv[1];
+	} else {
+		ip_param = "127.0.0.1";
+	}
+	
+	cout << "La direccion del servidor es " << ip_param << endl;
+	
+	/*
 	socketHelper prueba("127.0.0.1",true);
 	prueba.sh_connect();
 	
@@ -26,6 +38,6 @@ int main(){
     }
     cout << "Reply received\n" << endl;
     cout << server_reply << endl;
-     
+    */
     return 0;
 }
