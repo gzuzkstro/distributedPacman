@@ -15,24 +15,30 @@ socketHelper::socketHelper(bool protocol){
 	
 	if (socket_desc == -1)
     {
-        cout << "Could not create socket!" << endl;
+        cout << "No se pudo crear el socket!" << endl;
     }
     
-    cout << "Created socket!" << endl;
+    cout << "Creado socket servidor " << ((type)?"TCP":"UDP") << endl;
     
     //Prepares the sockaddr_in structure
-    server.sin_family = AF_INET;
+    addr.sin_family = AF_INET;
+    cout << "...sin_family:" << addr.sin_family << endl;
     
     if(type){
-		server.sin_addr.s_addr = INADDR_ANY;
+		addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	} else {
-		server.sin_addr.s_addr = inet_addr(PAC_GROUP);
+		addr.sin_addr.s_addr = inet_addr(PAC_GROUP);
 	}
+	cout << "...sin_addr.s_addr:" << ntohs(addr.sin_addr.s_addr) << endl;
 	
-    server.sin_port = htons(PAC_PORT);
+    addr.sin_port = htons(PAC_PORT);
+    cout << "...sin_port:" << ntohs(addr.sin_port) << endl;
+    cout << endl;
 }
 
 //Constructor for a client socket
+//ipaddress: should be passed even for UDP
+//type: true(TCP), false(UDP)
 socketHelper::socketHelper(const char *ipaddress, bool protocol){
 	
 	type = protocol;
@@ -47,47 +53,70 @@ socketHelper::socketHelper(const char *ipaddress, bool protocol){
 	
 	if (socket_desc == -1)
     {
-        cout << "Could not create socket!" << endl;
+        cout << "No se pudo crear el socket!" << endl;
     }
     
-    cout << "Created socket!" << endl;
+    cout << "Creado socket cliente " << ((type)?"TCP":"UDP") << endl;
     
     //Prepares the sockaddr_in structure
-    server.sin_family = AF_INET;
-    server.sin_addr.s_addr = inet_addr(ipaddress);
-    server.sin_port = htons(PAC_PORT);
+    addr.sin_family = AF_INET;
+    
+    if(type){
+		addr.sin_addr.s_addr = inet_addr(ipaddress);
+	} else {
+		addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	}
+	cout << "...sin_addr:" << inet_ntoa(addr.sin_addr) << endl;
+	
+    addr.sin_port = htons(PAC_PORT);
+    cout << "...sin_port:" << ntohs(addr.sin_port) << endl;
+    cout << endl;
 }
 
+//Setter for number of players
+void socketHelper::sh_setNumPlayers(int num){
+	num_players = num;
+}
+
+//Binds socket to port
 int socketHelper::sh_bind(){
 	
-	//Binds socket to port
-    if( bind(socket_desc,(struct sockaddr *)&server , sizeof(server)) < 0)
+    if( bind(socket_desc,(struct sockaddr *)&addr , sizeof(addr)) < 0)
     {
-        cout << "bind failed" << endl;
+        cout << "Fallo en bind" << endl;
         return 1;
     }
-    cout << "bind done" << endl;
-    
+    cout << "BIND listo, ";
     return 0;
 }
 
+//Defines how maximum connection queue
 void socketHelper::sh_listen(){
-	
-	//Listen
-    listen(socket_desc , NUM_CONN);
+
+    if( listen(socket_desc , num_players) < 0)
+    {
+		cout << "Fallo en LISTEN" << endl;
+	}
+    cout << "LISTEN listo" << endl;
 }
 
-int socketHelper::sh_accept(){
-	//Accept and incoming connection
-    cout << "Waiting for incoming connections..." << endl;
-    c = sizeof(struct sockaddr_in);
+//Starts accepting connections and assigns threads to handle
+int socketHelper::sh_acceptLoop(){
+	
+    cout << "Esperando por conexiones entrantes..." << endl << endl;
+    addrlen = sizeof(struct sockaddr_in);
     
-    while( (new_socket = accept(socket_desc, (struct sockaddr *)&client, (socklen_t*)&c)) )
+    while( (new_socket = accept(socket_desc, (struct sockaddr *)&client, (socklen_t*)&addrlen)) )
     {
-        cout << "Connection accepted" << endl;
-       
+        cout << "Conexion aceptada:" << endl;
+        
+        //Prints connection data
+		cout << "...sin_addr:" << inet_ntoa(client.sin_addr) << endl;
+		cout << "...sin_port:" << ntohs(client.sin_port) << endl;
+		cout << endl;
+		
         //Reply to the client
-        message = "Hello Client , I have received your connection. And now I will assign a handler for you\n";
+        message = "Tu solicitud ha sido aceptada por el servidor";
         write(new_socket , message , MSGBUFSIZE);
          
         pthread_t sniffer_thread;
@@ -96,13 +125,12 @@ int socketHelper::sh_accept(){
          
         if( pthread_create( &sniffer_thread , NULL ,  connection_handler , (void*) new_sock) < 0)
         {
-            cout << "could not create thread" << endl;
+            cout << "No se pudo crear el hilo" << endl;
             return 1;
         }
          
-        //Now join the thread , so that we dont terminate before the thread
         //pthread_join( sniffer_thread , NULL);
-        cout << "Handler assigned" << endl;
+        cout << "Manejador asignado a la conexion entrante" << endl << endl;
     }
      
     if (new_socket<0)
@@ -114,16 +142,16 @@ int socketHelper::sh_accept(){
     return 0;
 }
 
+//Connects to remote server
 int socketHelper::sh_connect() {
 	
-	//Connect to remote server
-    if (connect(socket_desc , (struct sockaddr *)&server , sizeof(server)) < 0)
+    if (connect(socket_desc , (struct sockaddr *)&addr , sizeof(addr)) < 0)
     {
-        cout << "connect error" << endl;
+        cout << "Error en CONNECT" << endl;
         return 1;
     }
      
-    cout << "Connected" << endl;
+    cout << "CONNECT listo" << endl;
     return 0;
 }
 
@@ -142,9 +170,9 @@ int socketHelper::sh_setGroup(){
 int socketHelper::sh_udpLoop(){
 	/* now just enter a read-print loop */
      while (1) {
-	  addrlen=sizeof(server);
+	  addrlen=sizeof(addr);
 	  if ((nbytes=recvfrom(socket_desc,msgbuf,MSGBUFSIZE,0,
-			(struct sockaddr *) &server,&addrlen)) < 0) {
+			(struct sockaddr *) &addr,&addrlen)) < 0) {
 			cout << "recvfrom" << endl;
 	       exit(1);
 	  }
