@@ -31,7 +31,7 @@ class socketHelper {
 		int c;
 		int nbytes;
 		unsigned int addrlen;
-		char msgbuf[MSGBUFSIZE];
+		char msgbuf[MSGBUFSIZE]; // Cambiar por estructura o matriz
 		const char *message;
 		
 		socketHelper(bool protocol);
