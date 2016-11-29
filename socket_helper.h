@@ -8,14 +8,17 @@
 #include <time.h>
 #include <pthread.h>
 #include <iostream>
+#include <cstdio>
 #include <string>
 #include <cstdlib>
+#include <string.h>
 #include <unistd.h>
 
 #define PAC_PORT 12345
-#define NUM_CONN 5
+#define NUM_CONN 2
 #define PAC_GROUP "225.0.0.37"
 #define MSGBUFSIZE 256
+#define NAP_TCP 4
 
 using namespace std;
 
@@ -43,12 +46,14 @@ class socketHelper {
 		void sh_listen();
 		int sh_acceptLoop();
 		int sh_connect();
-		int sh_setGroup();
+		int sh_setMCGroup();
 
 		/* test */
-		int sh_udpLoop();
+		int sh_recvStateLoop();
+		int sh_sendStateLoop();
 };
 
 void *connection_handler(void *);
+void *connection_handler_client(void *);
 
 #endif

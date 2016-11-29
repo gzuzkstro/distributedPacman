@@ -3,6 +3,9 @@
 
 using namespace std;
 
+void UDPsettings () {
+	
+}
 int main(int argc, char** argv){
 	
 	const char *ip_param;
@@ -16,38 +19,16 @@ int main(int argc, char** argv){
 	
 	cout << "La direccion del servidor es " << ip_param << endl;
 	
-	
-	socketHelper prueba(ip_param,true);
-	prueba.sh_connect();
-	
-	//Send some data
-    char server_reply[2000];
-     
-    if( recv(prueba.socket_desc, server_reply , 2000 , 0) < 0)
-    {
-        cout << "recv failed" << endl;
-    }
-    cout << "Reply received" << endl;
-    cout << server_reply << endl;
+	//TCP socket settings
+	socketHelper TCPclient(ip_param,true);
+	TCPclient.sh_connect();
     
-    /*
-    prueba.message = "GET / HTTP/1.1\r\n\r\n";
-    if( send(prueba.socket_desc , prueba.message , MSGBUFSIZE , 0) < 0)
-    {
-        cout << "Send failed" << endl;
-        return 1;
-    }
-    cout << "Data Send\n" << endl;
-     
-     char server_reply[2000];
-     
-    //Receive a reply from the server
-		if( recv(prueba.socket_desc, server_reply , 2000 , 0) < 0)
-    {
-        cout << "recv failed" << endl;
-    }
-    cout << "Reply received\n" << endl;
-    cout << server_reply << endl;
-    */
+    //UDP socket settings
+    socketHelper UDPclient(ip_param,false);
+    UDPclient.sh_setMCGroup();
+    UDPclient.sh_bind();
+    UDPclient.sh_recvStateLoop();
+    
+    sleep(100);
     return 0;
 }
