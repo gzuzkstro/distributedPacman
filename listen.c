@@ -14,6 +14,8 @@
 #include <time.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include "game_logic.h"
 
 
 #define HELLO_PORT 12345
@@ -23,9 +25,11 @@
 main(int argc, char *argv[])
 {
      struct sockaddr_in addr;
-     int fd, nbytes,addrlen;
+     int fd, nbytes;
+     unsigned int addrlen;
      struct ip_mreq mreq;
      char msgbuf[MSGBUFSIZE];
+     game_logic *gl = (game_logic *)malloc(sizeof(game_logic));
 
      u_int yes=1;            /*** MODIFICATION TO ORIGINAL */
 
@@ -49,13 +53,13 @@ main(int argc, char *argv[])
      addr.sin_family=AF_INET;
      addr.sin_addr.s_addr=htonl(INADDR_ANY); /* N.B.: differs from sender */
      addr.sin_port=htons(HELLO_PORT);
-     
+
      /* bind to receive address */
      if (bind(fd,(struct sockaddr *) &addr,sizeof(addr)) < 0) {
 	  perror("bind");
 	  exit(1);
      }
-     
+
      /* use setsockopt() to request that the kernel join a multicast group */
      mreq.imr_multiaddr.s_addr=inet_addr(HELLO_GROUP);
      mreq.imr_interface.s_addr=htonl(INADDR_ANY);
@@ -67,12 +71,19 @@ main(int argc, char *argv[])
      /* now just enter a read-print loop */
      while (1) {
 	  addrlen=sizeof(addr);
-	  if ((nbytes=recvfrom(fd,msgbuf,MSGBUFSIZE,0,
+	  if ((nbytes=recvfrom(fd,gl,sizeof(game_logic),0,
 			       (struct sockaddr *) &addr,&addrlen)) < 0) {
 	       perror("recvfrom");
 	       exit(1);
 	  }
-	  puts(msgbuf);
-     }
+	  printf("%d\n", gl->getAcum());
+        gl->initNcurses();
+       int i = 0;
+        while (1) {
+            gl->draw();
+            sleep(1);
+            refresh();
+        }
+    }
 }
 

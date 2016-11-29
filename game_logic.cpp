@@ -2,14 +2,29 @@
 
 game_logic::game_logic()
 {
+	_x= 0;
+	_y= 0;
+	pts = 0;
+    vidas = 3;
+    acum = 0;
+    pacts = 0;
+
+    clear();
+}
+
+game_logic::~game_logic()
+{
+    endwin();
+}
+
+void game_logic::initNcurses()
+{
     // Inicializa ncurses
     initscr();
 	noecho();
 	curs_set(FALSE);
 	nodelay (stdscr, TRUE);
 	getmaxyx(stdscr, max_y, max_x);
-	_x= (max_x/2)-15;
-	_y=  max_y/6;
 
 	// COLOR
 	if (has_colors()) start_color();
@@ -21,29 +36,82 @@ game_logic::game_logic()
 	init_pair(5, COLOR_CYAN, COLOR_BLACK);     // Fantasma 3
 	init_pair(6, COLOR_GREEN, COLOR_BLACK);    // Fantasma 4
 	init_pair(7, COLOR_BLUE, COLOR_BLACK);     // Fantasma comestibles
-	init_pair(8, COLOR_WHITE, COLOR_BLACK);
-
-	// MAPA
-
-
-    clear();
+	init_pair(8, COLOR_WHITE, COLOR_BLACK);    // Fantasmas comestibles y pared donde salen los fantasmas de la caja
+	init_pair(9, COLOR_BLACK, COLOR_BLACK);    // Es pacio vacio
 }
 
-game_logic::~game_logic()
-{
 
+void game_logic::print_map(char c,int x,int y)
+{
+    switch(c)
+{
+	case '.':
+        attron(COLOR_PAIR(1));
+		break;
+	case 'P':
+        attron(COLOR_PAIR(1));
+		break;
+	case '_':
+        attron(COLOR_PAIR(2));
+		break;
+	case ' ':
+        attron(COLOR_PAIR(9));
+		break;
+	case '-':
+        attron(COLOR_PAIR(8));
+		break;
+    case 'o':
+        attron(COLOR_PAIR(8));
+		break;
+}
+
+mvprintw(x, y, "%c",c);
+
+}
+
+char * game_logic::acum_str(int n)
+{
+    char str[11];
+    int i;
+
+    for ( i = 0; i < n && i < 10 ; i++)
+        str[i] = '.';
+    str[i] = '\0';
+
+    return str;
+}
+
+void game_logic::print_info()
+{
+    attron(COLOR_PAIR(1));
+    mvprintw(Y_INFO, X_INFO, "%s: %d","score", pts);
+    mvprintw(Y_INFO + 2, X_INFO, "%s: %d","lives", vidas);
+    if (acum >= 10)
+        mvprintw(Y_INFO + 4, X_INFO, "activar poder en \"p\": %s", acum_str(acum));
+    else
+        mvprintw(Y_INFO + 4, X_INFO, "pacts acumulados: %s", acum_str(acum));
 }
 
 void game_logic::draw()
 {
-    attron(COLOR_PAIR(1)); mvprintw(_y, _x, "%c",'P');
-    attron(COLOR_PAIR(2)); mvprintw(_y + 1, _x + 1, "%c",'_');
-    attron(COLOR_PAIR(3)); mvprintw(_y + 2, _x + 2, "%c",'F');
-    attron(COLOR_PAIR(4)); mvprintw(_y + 3, _x + 3, "%c",'F');
-    attron(COLOR_PAIR(5)); mvprintw(_y + 4, _x + 4, "%c",'F');
-    attron(COLOR_PAIR(6)); mvprintw(_y + 5, _x + 5, "%c",'F');
-    attron(COLOR_PAIR(7)); mvprintw(_y + 6, _x + 6, "%c",'F');
-    attron(COLOR_PAIR(8)); mvprintw(_y + 7, _x + 7, "%c",'F');
+    for (int i = 0 ; i < 30 ; i++ )
+    {
+        for (int j = 0 ; j < 30 ; j++ )
+        {
+            this->print_map(mapa[i][j], i, j);
+        }
+    }
+    print_info();
+}
 
 
+// Sets y gets
+void game_logic::setAcum(int n)
+{
+    this->acum = n;
+}
+
+int game_logic::getAcum()
+{
+    return this->acum;
 }
