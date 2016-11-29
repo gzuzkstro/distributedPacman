@@ -65,12 +65,21 @@ socketHelper::socketHelper(const char *ipaddress, bool protocol){
 		addr.sin_addr.s_addr = inet_addr(ipaddress);
 	} else {
 		addr.sin_addr.s_addr = htonl(INADDR_ANY);
+		
+		u_int yes=1;
+
+		// Allow multiple sockets to use the same PORT number
+		if (setsockopt(socket_desc,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(yes)) < 0) {
+			cout << "Reusing ADDR failed" << endl;
+			exit(1);
+		}
 	}
 	cout << "...sin_addr:" << inet_ntoa(addr.sin_addr) << endl;
 	
     addr.sin_port = htons(PAC_PORT);
     cout << "...sin_port:" << ntohs(addr.sin_port) << endl;
     cout << endl;
+    
 }
 
 //Setter for number of players
@@ -87,6 +96,7 @@ int socketHelper::sh_bind(){
         return 1;
     }
     cout << "BIND listo, ";
+    
     return 0;
 }
 
@@ -157,10 +167,43 @@ int socketHelper::sh_connect() {
     }
      
     cout << "CONNECT listo" << endl;
+    
+    pthread_t client_thread;
+	//new_sock = (int *)malloc(1);
+	//*new_sock = new_socket;
+	 
+	if( pthread_create( &client_thread , NULL ,  connection_handler_client , (void*) &socket_desc) < 0)
+	{
+		cout << "No se pudo crear el hilo" << endl;
+		return 1;
+	}
+	
+	cout << "Se creo el hilo para manejar TCP en cliente" << endl;
+        
+    /*
+    char buffer[MSGBUFSIZE];
+     
+    if( read(TCPclient.socket_desc, buffer , MSGBUFSIZE) < 0)
+    {
+        cout << "Fallo en READ" << endl;
+    }
+    
+    //Server should be asking for a name
+    cout << "Servidor:" << buffer << endl;
+    cin >> buffer;
+    
+    if( write(TCPclient.socket_desc , buffer , MSGBUFSIZE) < 0)
+    {
+        cout << "Fallo en WRITE" << endl;
+        return 1;
+    }
+    cout << "Mensaje enviado al servidor" << endl;
+    */
+    
     return 0;
 }
 
-int socketHelper::sh_setGroup(){
+int socketHelper::sh_setMCGroup(){
 	
 	mreq.imr_multiaddr.s_addr=inet_addr(PAC_GROUP);
 	mreq.imr_interface.s_addr=htonl(INADDR_ANY);
@@ -172,17 +215,38 @@ int socketHelper::sh_setGroup(){
 	return 0;
 }
 
-int socketHelper::sh_udpLoop(){
+int socketHelper::sh_recvStateLoop(){
 	/* now just enter a read-print loop */
+	
+	char buffer[MSGBUFSIZE];
+	
      while (1) {
 	  addrlen=sizeof(addr);
-	  if ((nbytes=recvfrom(socket_desc,msgbuf,MSGBUFSIZE,0,
+	  if ((nbytes=recvfrom(socket_desc,buffer,MSGBUFSIZE,0,
 			(struct sockaddr *) &addr,&addrlen)) < 0) {
 			cout << "recvfrom" << endl;
 	       exit(1);
 	  }
-	  cout << message << endl;
+	  cout << buffer << endl;
      }
+}
+
+int socketHelper::sh_sendStateLoop(){
+	int i = 0;
+	char buffer[MSGBUFSIZE];
+	
+     while (1) {
+	  sprintf(buffer,"Multicast #%d",i);
+	  cout << buffer << endl;
+	  if (sendto(socket_desc,buffer,sizeof(buffer),0,(struct sockaddr *) &addr,
+		     sizeof(addr)) < 0) {
+	       cout << "Fallo en SENDTO" << endl;
+	       exit(1);
+	  }
+	  i++;
+	  sleep(2);
+     }
+     return 0;
 }
 
 /*
@@ -193,12 +257,55 @@ void *connection_handler(void *socket_desc)
     //Get the socket descriptor
     int sock = *(int*)socket_desc;
      
-    char message[MSGBUFSIZE];
+    char buffer[MSGBUFSIZE];
     
     //User should be sending a name
-    read(sock, message , MSGBUFSIZE);
-    cout << "Username:" << message << endl;
+    read(sock, buffer , MSGBUFSIZE);
+    cout << "Username:" << buffer << endl;
     //save it?
+    
+    while(1){
+		
+		strcpy(buffer,"TCP server says bye!");
+		write(sock, buffer, MSGBUFSIZE);
+		
+		read(sock, buffer,MSGBUFSIZE);
+		cout << "CliTCP:" << buffer << endl;
+		
+		sleep(NAP_TCP);
+	}
+    
+    //Free the socket pointer
+    free(socket_desc);
+    
+    return 0;
+}
+
+/*
+ * This will handle TCP connection on each client
+ * */
+void *connection_handler_client(void *socket_desc)
+{
+    //Get the socket descriptor
+    int sock = *(int*)socket_desc;
+     
+    char buffer[MSGBUFSIZE];
+    
+    //Server should be asking for a name
+    read(sock, buffer , MSGBUFSIZE);
+    cout << buffer << endl;
+    cin >> buffer;
+    write(sock, buffer, MSGBUFSIZE);
+    
+    while(1){
+		read(sock, buffer , MSGBUFSIZE);
+		cout << "ServTCP:" << buffer << endl;
+		
+		strcpy(buffer,"TCP client says something!");
+		write(sock, buffer, MSGBUFSIZE);
+		
+		//sleep(NAP_TCP)
+	}
     
     //Free the socket pointer
     free(socket_desc);

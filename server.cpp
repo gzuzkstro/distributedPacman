@@ -22,6 +22,7 @@ int main(int argc, char** argv){
 	cout << "El servidor está esperando por " << num_players << " jugardores" << endl;
 	cout << endl;
 	
+	//The server waits for connections
 	socketHelper TCPserver(true);
 	TCPserver.sh_setNumPlayers(num_players);
 	TCPserver.sh_bind();
@@ -30,7 +31,8 @@ int main(int argc, char** argv){
 	
 	//After all connections are set up, the UPD multi-cast starts
     socketHelper UDPserver(false);
+    UDPserver.sh_sendStateLoop();
     
-    
+    sleep(100);
 	return 0;
 }
