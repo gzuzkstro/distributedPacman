@@ -22,6 +22,11 @@
 
 using namespace std;
 
+struct threadParams {
+	int *dif;
+	int *sock;
+};
+
 class socketHelper {
 	public:
 		bool type;
@@ -36,7 +41,7 @@ class socketHelper {
 		unsigned int addrlen;	//suspect
 		char msgbuf[MSGBUFSIZE];	//should be 2D?
 		const char *message;	//suspect
-
+		int sync[NUM_CONN];
 
 		socketHelper(bool protocol);
 		socketHelper(const char *ipaddress, bool protocol);

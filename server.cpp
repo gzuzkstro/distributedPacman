@@ -29,6 +29,7 @@ int main(int argc, char** argv){
 	TCPserver.sh_listen();
 	TCPserver.sh_acceptLoop();
 	
+	cout << "Ya está listo para comenzar el otro servidor" << endl;
 	//After all connections are set up, the UPD multi-cast starts
     socketHelper UDPserver(false);
     UDPserver.sh_sendStateLoop();

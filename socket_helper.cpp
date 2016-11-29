@@ -116,9 +116,11 @@ int socketHelper::sh_acceptLoop(){
     cout << "Esperando por conexiones entrantes..." << endl << endl;
     addrlen = sizeof(struct sockaddr_in);
     
-    int conn_count = num_players;
+    int conn_count = 0;
     
-    while(conn_count > 0 && 
+    struct threadParams *params;
+    
+    while(conn_count < num_players && 
     (new_socket = accept(socket_desc, (struct sockaddr *)&client, (socklen_t*)&addrlen)) )
     {
         cout << "Conexion aceptada:" << endl;
@@ -131,30 +133,38 @@ int socketHelper::sh_acceptLoop(){
         //Reply to the client
         message = "Tu solicitud ha sido aceptada por el servidor, por favor enviar nombre";
         write(new_socket , message , MSGBUFSIZE);
-         
+        
+        /* legacy code */ 
         pthread_t sniffer_thread;
         new_sock = (int *)malloc(1);
         *new_sock = new_socket;
-         
-        if( pthread_create( &sniffer_thread , NULL ,  connection_handler , (void*) new_sock) < 0)
+        
+        params = (struct threadParams *)malloc(sizeof(struct threadParams));
+        params->dif = &sync[conn_count];
+        params->sock = (int *)malloc(1);
+        *(params->sock) = new_socket;
+        
+        //if( pthread_create( &sniffer_thread , NULL ,  connection_handler , (void*) new_sock) < 0)
+        if( pthread_create( &sniffer_thread , NULL ,  connection_handler , (void*)params) < 0)
         {
             cout << "No se pudo crear el hilo" << endl;
             return 1;
         }
         
-        conn_count--;
+        conn_count++;
         cout << "Manejador asignado a la conexion entrante" << endl;
         cout << "Faltan " << conn_count << " jugadores por conectarse..." << endl << endl;
-        
-    }
+          
+		cout << "Aqui" << sync[0] << "," << sync[1] << endl;
+    
+	}
      
     if (new_socket<0)
     {
         cout << "accept failed" << endl;
         return 1;
     }
-    
-    return 0;
+	return 0;
 }
 
 //Connects to remote server
@@ -216,7 +226,6 @@ int socketHelper::sh_setMCGroup(){
 }
 
 int socketHelper::sh_recvStateLoop(){
-	/* now just enter a read-print loop */
 	
 	char buffer[MSGBUFSIZE];
 	
@@ -252,17 +261,28 @@ int socketHelper::sh_sendStateLoop(){
 /*
  * This will handle TCP connection for each client
  * */
-void *connection_handler(void *socket_desc)
+void *connection_handler(void *params)
 {
     //Get the socket descriptor
-    int sock = *(int*)socket_desc;
-     
+    struct threadParams *context = (struct threadParams *)params;
+	int sock = *(int*)context->sock;
+	int *dif = context->dif;
     char buffer[MSGBUFSIZE];
     
     //User should be sending a name
     read(sock, buffer , MSGBUFSIZE);
     cout << "Username:" << buffer << endl;
     //save it?
+    
+    //Gets time from client
+	time_t sec_server;
+    read(sock, buffer , MSGBUFSIZE);
+    sleep(1);
+    sec_server = time(0);
+    int sec_client = atoi(buffer);
+	*dif = sec_server - sec_client;
+    cout << "La diferencia es: " << *dif << endl;
+    sleep(3);
     
     while(1){
 		
@@ -276,7 +296,7 @@ void *connection_handler(void *socket_desc)
 	}
     
     //Free the socket pointer
-    free(socket_desc);
+    free(&sock);
     
     return 0;
 }
@@ -297,11 +317,21 @@ void *connection_handler_client(void *socket_desc)
     cin >> buffer;
     write(sock, buffer, MSGBUFSIZE);
     
+	//Time is sent for sync purpose
+	time_t seconds;
+	seconds = time(0);
+	sprintf(buffer,"%ld", seconds);
+	write(sock, buffer, MSGBUFSIZE);
+		
     while(1){
 		read(sock, buffer , MSGBUFSIZE);
 		cout << "ServTCP:" << buffer << endl;
 		
-		strcpy(buffer,"TCP client says something!");
+
+		/* Getting time to later sync */
+		time_t seconds;
+		seconds = time(0);
+		sprintf(buffer,"TCP client says something! in %ld", seconds);
 		write(sock, buffer, MSGBUFSIZE);
 		
 		//sleep(NAP_TCP)
