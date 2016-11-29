@@ -22,11 +22,15 @@ int main(int argc, char** argv){
 	cout << "El servidor está esperando por " << num_players << " jugardores" << endl;
 	cout << endl;
 	
-	socketHelper server(true);
-	server.sh_setNumPlayers(num_players);
-	server.sh_bind();
-	server.sh_listen();
-	server.sh_acceptLoop();
+	socketHelper TCPserver(true);
+	TCPserver.sh_setNumPlayers(num_players);
+	TCPserver.sh_bind();
+	TCPserver.sh_listen();
+	TCPserver.sh_acceptLoop();
 	
+	//After all connections are set up, the UPD multi-cast starts
+    socketHelper UDPserver(false);
+    
+    
 	return 0;
 }

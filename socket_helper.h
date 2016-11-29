@@ -13,7 +13,7 @@
 #include <unistd.h>
 
 #define PAC_PORT 12345
-#define NUM_CONN 5
+#define NUM_CONN 2
 #define PAC_GROUP "225.0.0.37"
 #define MSGBUFSIZE 256
 

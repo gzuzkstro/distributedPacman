@@ -106,7 +106,10 @@ int socketHelper::sh_acceptLoop(){
     cout << "Esperando por conexiones entrantes..." << endl << endl;
     addrlen = sizeof(struct sockaddr_in);
     
-    while( (new_socket = accept(socket_desc, (struct sockaddr *)&client, (socklen_t*)&addrlen)) )
+    int conn_count = num_players;
+    
+    while(conn_count > 0 && 
+    (new_socket = accept(socket_desc, (struct sockaddr *)&client, (socklen_t*)&addrlen)) )
     {
         cout << "Conexion aceptada:" << endl;
         
@@ -116,7 +119,7 @@ int socketHelper::sh_acceptLoop(){
 		cout << endl;
 		
         //Reply to the client
-        message = "Tu solicitud ha sido aceptada por el servidor";
+        message = "Tu solicitud ha sido aceptada por el servidor, por favor enviar nombre";
         write(new_socket , message , MSGBUFSIZE);
          
         pthread_t sniffer_thread;
@@ -128,9 +131,11 @@ int socketHelper::sh_acceptLoop(){
             cout << "No se pudo crear el hilo" << endl;
             return 1;
         }
-         
-        //pthread_join( sniffer_thread , NULL);
-        cout << "Manejador asignado a la conexion entrante" << endl << endl;
+        
+        conn_count--;
+        cout << "Manejador asignado a la conexion entrante" << endl;
+        cout << "Faltan " << conn_count << " jugadores por conectarse..." << endl << endl;
+        
     }
      
     if (new_socket<0)
@@ -181,25 +186,22 @@ int socketHelper::sh_udpLoop(){
 }
 
 /*
- * This will handle connection for each client
+ * This will handle TCP connection for each client
  * */
 void *connection_handler(void *socket_desc)
 {
     //Get the socket descriptor
     int sock = *(int*)socket_desc;
      
-    char const *message;
-     
-    //Send some messages to the client
-    message = "Greetings! I am your connection handler\n";
-    write(sock , message , MSGBUFSIZE);
-     
-    message = "Its my duty to communicate with you";
-    write(sock , message , MSGBUFSIZE);
-     
+    char message[MSGBUFSIZE];
+    
+    //User should be sending a name
+    read(sock, message , MSGBUFSIZE);
+    cout << "Username:" << message << endl;
+    //save it?
+    
     //Free the socket pointer
     free(socket_desc);
     
-    cout << "Am I working?" << endl;
     return 0;
 }
