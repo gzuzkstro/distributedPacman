@@ -16,11 +16,21 @@ int main(int argc, char** argv){
 	
 	cout << "La direccion del servidor es " << ip_param << endl;
 	
-	/*
-	socketHelper prueba("127.0.0.1",true);
+	
+	socketHelper prueba(ip_param,true);
 	prueba.sh_connect();
 	
 	//Send some data
+    char server_reply[2000];
+     
+    if( recv(prueba.socket_desc, server_reply , 2000 , 0) < 0)
+    {
+        cout << "recv failed" << endl;
+    }
+    cout << "Reply received" << endl;
+    cout << server_reply << endl;
+    
+    /*
     prueba.message = "GET / HTTP/1.1\r\n\r\n";
     if( send(prueba.socket_desc , prueba.message , MSGBUFSIZE , 0) < 0)
     {
