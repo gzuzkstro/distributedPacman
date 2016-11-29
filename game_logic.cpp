@@ -9,7 +9,7 @@ game_logic::game_logic()
     acum = 0;
     pacts = 0;
 
-    clear();
+
 }
 
 game_logic::~game_logic()
@@ -17,14 +17,13 @@ game_logic::~game_logic()
     endwin();
 }
 
-void game_logic::initNcurses()
+void initNcurses()
 {
     // Inicializa ncurses
     initscr();
 	noecho();
 	curs_set(FALSE);
 	nodelay (stdscr, TRUE);
-	getmaxyx(stdscr, max_y, max_x);
 
 	// COLOR
 	if (has_colors()) start_color();
@@ -38,6 +37,8 @@ void game_logic::initNcurses()
 	init_pair(7, COLOR_BLUE, COLOR_BLACK);     // Fantasma comestibles
 	init_pair(8, COLOR_WHITE, COLOR_BLACK);    // Fantasmas comestibles y pared donde salen los fantasmas de la caja
 	init_pair(9, COLOR_BLACK, COLOR_BLACK);    // Es pacio vacio
+
+    clear();
 }
 
 
@@ -62,6 +63,18 @@ void game_logic::print_map(char c,int x,int y)
 		break;
     case 'o':
         attron(COLOR_PAIR(8));
+		break;
+    case 'F':
+        attron(COLOR_PAIR(3));
+		break;
+    case 'G':
+        attron(COLOR_PAIR(4));
+		break;
+    case 'M':
+        attron(COLOR_PAIR(5));
+		break;
+    case 'N':
+        attron(COLOR_PAIR(6));
 		break;
 }
 
@@ -114,4 +127,45 @@ void game_logic::setAcum(int n)
 int game_logic::getAcum()
 {
     return this->acum;
+}
+
+
+int game_logic::getPts()
+{
+    return this->pts;
+}
+
+void game_logic::setPts(int n)
+{
+    this->pts = n;
+}
+
+int game_logic::getVidas()
+{
+    return this->vidas;
+}
+
+void game_logic::setVidas(int n)
+{
+    this->vidas = n;
+}
+
+int game_logic::getPacts()
+{
+    return this->pacts;
+}
+
+void game_logic::setPacts(int n)
+{
+    this->pacts = n;
+}
+
+void game_logic::setCell(int x, int y, char c)
+{
+    this->mapa[x][y] = c;
+}
+
+char game_logic::getCell(int x, int y)
+{
+    return this->mapa[x][y];
 }

@@ -5,12 +5,12 @@ using namespace std;
 int main(int argc, char const *argv[])
 {
     game_logic *gl = new game_logic();
-    gl->initNcurses();
+    initNcurses();
     int i = 0;
     while(1){
         gl->draw();
         gl->setAcum(i++);
-        sleep(1);
+        usleep(200000);
         refresh();
     }
 

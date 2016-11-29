@@ -10,6 +10,8 @@
 
 using namespace std;
 
+void initNcurses();
+
 class game_logic
 {
     public:
@@ -19,14 +21,20 @@ class game_logic
         void draw();
         void print_info();
         char* acum_str(int n);
-        void initNcurses();
-
         void setAcum(int n);
         int getAcum();
+        void setPts(int n);
+        int getPts();
+        void setVidas(int n);
+        int getVidas();
+        void setPacts(int n);
+        int getPacts();
+        void setCell(int x, int y, char c);
+        char getCell(int x, int y);
     protected:
     private:
         // Mapa del juego
-        char mapa[100][100] = {
+        char mapa[35][35] = {
             "______________________________",
             "__............__............__",
             "__.____._____.__._____.____.__",
@@ -59,16 +67,16 @@ class game_logic
             "______________________________"};
 
 
-        int max_x;  // por definir
-        int max_y;  // por definir
-        int _x;     // por definir
-        int _y;     // por definir
+        int _x;
+        int _y;
 
 
         int pts;    // Puntaje del juego
         int vidas;  // vidas de pacman
         int acum;   // pacdocts acumulados para activar el poder
         int pacts;  // pacdots consumidos
+
+
 };
 
 #endif // GAME_LOGIC_H

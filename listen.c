@@ -30,7 +30,7 @@ main(int argc, char *argv[])
      struct ip_mreq mreq;
      char msgbuf[MSGBUFSIZE];
      game_logic *gl = (game_logic *)malloc(sizeof(game_logic));
-
+     initNcurses();
      u_int yes=1;            /*** MODIFICATION TO ORIGINAL */
 
      /* create what looks like an ordinary UDP socket */
@@ -77,7 +77,6 @@ main(int argc, char *argv[])
 	       exit(1);
 	  }
 	  printf("%d\n", gl->getAcum());
-        gl->initNcurses();
        int i = 0;
         while (1) {
             gl->draw();
