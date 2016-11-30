@@ -157,8 +157,14 @@ void game_logic::asignarPos(int mov[5][2])
 {
     for (int i = 0 ; i < NUM_CONN ; i++)
     {
-        pos_players[i][0] += mov[i][0];
-        pos_players[i][1] += mov[i][1];
+        int *y = &(pos_players[i][0]);
+        int *x = &(pos_players[i][1]);
+        int ny = *y + mov[i][0];
+        int nx = *x + mov[i][1];
+
+        if (mapa[ny][nx] == CELL_W || (mapa[ny][nx])) {
+
+        }
     }
 }
 
