@@ -355,11 +355,15 @@ void *connection_handler_client(void *socket_desc)
     //Get the socket descriptor
     int sock = *(int*)socket_desc;
     int key;
+    int key_old = KEY_RIGHT;
 
     while(1){
         key = getch();
-		cout << "tecla:" << key << endl;
-		write(sock, &key , sizeof(key));
+        if  ( (key != key_old) && (key == KEY_UP || key == KEY_DOWN || key == KEY_LEFT || key == KEY_RIGHT) ) {
+            key_old = key;
+            cout << "tecla:" << key << endl;
+            write(sock, &key , sizeof(key));
+		}
 	}
 	/*
 

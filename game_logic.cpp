@@ -24,7 +24,7 @@ void initNcurses()
 	noecho();
 	curs_set(FALSE);
 	nodelay(stdscr, FALSE);
-	keypad(stdscr, FALSE);
+	keypad(stdscr, TRUE);
 	cbreak();
 
 	// COLOR
