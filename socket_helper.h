@@ -18,8 +18,8 @@
 #define PAC_PORT 12445
 #define PAC_GROUP "225.0.0.38"
 #define MSGBUFSIZE 256
-#define NAP_TCP 50000
-#define NAP_UDP 50000
+#define NAP_TCP 100000
+#define NAP_UDP 200000
 
 using namespace std;
 

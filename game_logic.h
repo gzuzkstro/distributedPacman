@@ -7,7 +7,8 @@
 #define MAXACUM 10
 #define X_INFO 40
 #define Y_INFO 5
-#define NUM_CONN 2
+#define NUM_CONN 3
+#define MAX_CONN 5
 
 #define PACMAN 'C'
 #define PACDOT '.'
@@ -19,6 +20,22 @@
 #define CLYDE 'K'
 #define INKY 'I'
 #define BLINKY 'B'
+
+#define POS_Y_PACMAN 16
+#define POS_X_PACMAN 15
+#define POS_Y_BLINKY 14
+#define POS_X_BLINKY 13
+#define POS_Y_PINKY 14
+#define POS_X_PINKY 14
+#define POS_Y_INKY 14
+#define POS_X_INKY 15
+#define POS_Y_CLYDE 14
+#define POS_X_CLYDE 16
+
+#define PACS_MAP 244
+#define MAX_X 30
+#define MAX_Y 30
+
 
 using namespace std;
 
@@ -50,6 +67,8 @@ class game_logic
         void setSync(int pos, int val);
         int getNumPlayers();
         void setNumPlayers(int val);
+        void calcularMov(int mov[5][2]);
+        void asignarPos(int mov[5][2]);
     protected:
     private:
         // Mapa del juego
@@ -86,17 +105,20 @@ class game_logic
             "______________________________"};
 
 
-        int _x;
-        int _y;
-
 
         int pts;    // Puntaje del juego
         int vidas;  // vidas de pacman
         int acum;   // pacdocts acumulados para activar el poder
         int pacts;  // pacdots consumidos
-        int dirs[NUM_CONN];   // arreglo de la ultima tecla precionada por cada jugador
+        int dirs[MAX_CONN] = {KEY_RIGHT,KEY_UP,KEY_UP,KEY_UP, KEY_UP};   // arreglo de la ultima tecla precionada por cada jugador
         int sync[NUM_CONN];   // eso era para hacer el manejo de las cuestinoes del tiempo
         int num_players;      // Num de jugadores
+        char char_players[MAX_CONN] = {PACMAN,BLINKY,PINKY,INKY,CLYDE};
+        int pos_players[MAX_CONN][2]  = {{POS_Y_PACMAN,POS_X_PACMAN}, // Posiciones de los jugadores
+                                        {POS_Y_BLINKY,POS_X_BLINKY},
+                                        {POS_Y_PINKY,POS_X_PINKY},
+                                        {POS_Y_INKY,POS_X_INKY},
+                                        {POS_Y_CLYDE,POS_X_CLYDE}};
 
         int aux;
         int daux;

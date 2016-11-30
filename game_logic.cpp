@@ -3,14 +3,14 @@
 game_logic::game_logic()
 {
     aux = 10;
-	_x= 0;
-	_y= 0;
 	pts = 0;
     vidas = 3;
     acum = 0;
     pacts = 0;
 
-
+    // Agregar jugadores al mapa
+    for (int i = 0 ; i < NUM_CONN ; i++)
+        mapa[pos_players[i][0]][pos_players[i][1]] = char_players[i];
 }
 
 game_logic::~game_logic()
@@ -117,12 +117,55 @@ void game_logic::draw()
             this->print_map(mapa[i][j], i, j);
         }
     }
+    for (int i = NUM_CONN-1; i >= 0  ; i--)
+    {
+        this->print_map(char_players[i], pos_players[i][0], pos_players[i][1]);
+    }
     print_info();
+}
+
+
+void game_logic::calcularMov(int mov[5][2])
+{
+// En las asignaciones el 0 representa "y" y el 1 representa "x"
+
+    for(int i = 0; i < MAX_CONN ; i++)
+    {
+        switch(dirs[i])
+        {
+            case KEY_UP:
+                mov[i][0] =-1;
+                mov[i][1] =0;
+                break;
+            case KEY_DOWN:
+                mov[i][0] =1;
+                mov[i][1] =0;
+                break;
+            case KEY_LEFT:
+                mov[i][0] =0;
+                mov[i][1] =-1;
+                break;
+            case KEY_RIGHT:
+                mov[i][0] =0;
+                mov[i][1] =1;
+                break;
+        }
+    }
+}
+
+void game_logic::asignarPos(int mov[5][2])
+{
+    for (int i = 0 ; i < NUM_CONN ; i++)
+    {
+        pos_players[i][0] += mov[i][0];
+        pos_players[i][1] += mov[i][1];
+    }
 }
 
 // Calculo del estado del juego
 void game_logic::nextState()
 {
+/*
     if (aux == 20)
         daux = -1;
     else if ( aux == 10 )
@@ -130,6 +173,10 @@ void game_logic::nextState()
     aux+= daux;
     mapa[aux-1][10] = CELL_W;
     mapa[aux][10] = PACMAN;
+*/
+    int mov[5][2];
+    calcularMov(mov);
+    asignarPos(mov);
 
 }
 
