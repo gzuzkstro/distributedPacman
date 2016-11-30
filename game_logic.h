@@ -36,6 +36,8 @@ class game_logic
         void setDir(int pos, int val);
         int *getSync(int pos);
         void setSync(int pos, int val);
+        int getNumPlayers();
+        void setNumPlayers(int val);
     protected:
     private:
         // Mapa del juego
@@ -82,6 +84,7 @@ class game_logic
         int pacts;  // pacdots consumidos
         int dirs[NUM_CONN];   // arreglo de la ultima tecla precionada por cada jugador
         int sync[NUM_CONN];   // eso era para hacer el manejo de las cuestinoes del tiempo
+        int num_players;      // Num de jugadores
 };
 
 #endif // GAME_LOGIC_H

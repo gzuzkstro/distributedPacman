@@ -31,7 +31,7 @@ int main(int argc, char** argv){
     socketHelper UDPclient(ip_param,false,gl);
     UDPclient.sh_setMCGroup();
     UDPclient.sh_bind();
-    UDPclient.sh_recvStateLoop();
+    UDPclient.sh_recvState();
 
     sleep(100);
     return 0;

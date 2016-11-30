@@ -1,6 +1,5 @@
 #include "socket_helper.h"
 
-
 //Constructor for a server socket
 //type: true(TCP), false(UDP)
 socketHelper::socketHelper(bool protocol, game_logic *g){
@@ -84,11 +83,6 @@ socketHelper::socketHelper(const char *ipaddress, bool protocol, game_logic *g){
 
 }
 
-//Setter for number of players
-void socketHelper::sh_setNumPlayers(int num){
-	num_players = num;
-}
-
 //Binds socket to port
 int socketHelper::sh_bind(){
 
@@ -105,7 +99,7 @@ int socketHelper::sh_bind(){
 //Defines how maximum connection queue
 void socketHelper::sh_listen(){
 
-    if( listen(socket_desc , num_players) < 0)
+    if( listen(socket_desc , gl->getNumPlayers()) < 0)
     {
 		cout << "Fallo en LISTEN" << endl;
 	}
@@ -113,7 +107,7 @@ void socketHelper::sh_listen(){
 }
 
 //Starts accepting connections and assigns threads to handle
-int socketHelper::sh_acceptLoop(){
+int socketHelper::sh_accept(){
 
     cout << "Esperando por conexiones entrantes..." << endl << endl;
     addrlen = sizeof(struct sockaddr_in);
@@ -122,7 +116,7 @@ int socketHelper::sh_acceptLoop(){
 
     struct threadParams *params;
 
-    while(conn_count < num_players &&
+    while(conn_count < gl->getNumPlayers() &&
     (new_socket = accept(socket_desc, (struct sockaddr *)&client, (socklen_t*)&addrlen)) )
     {
         cout << "Conexion aceptada:" << endl;
@@ -136,10 +130,8 @@ int socketHelper::sh_acceptLoop(){
         message = "Tu solicitud ha sido aceptada por el servidor, por favor enviar nombre";
         write(new_socket , message , MSGBUFSIZE);
 
-        /* legacy code */
         pthread_t sniffer_thread;
-        /*new_sock = (int *)malloc(1);
-        *new_sock = new_socket;*/
+
 
         params = (struct threadParams *)malloc(sizeof(struct threadParams));
         params->sock = (int *)malloc(1);
@@ -157,7 +149,7 @@ int socketHelper::sh_acceptLoop(){
 
         conn_count++;
         cout << "Manejador asignado a la conexion entrante" << endl;
-        cout << "Faltan " << num_players - conn_count << " jugadores por conectarse..." << endl << endl;
+        cout << "Faltan " << gl->getNumPlayers() - conn_count << " jugadores por conectarse..." << endl << endl;
 
 		//cout << "Aqui" << sync[0] << "," << sync[1] << endl;
 
@@ -210,26 +202,6 @@ int socketHelper::sh_connect() {
 
 	cout << "Se creo el hilo para manejar TCP en cliente" << endl;
 
-    /*
-    char buffer[MSGBUFSIZE];
-
-    if( read(TCPclient.socket_desc, buffer , MSGBUFSIZE) < 0)
-    {
-        cout << "Fallo en READ" << endl;
-    }
-
-    //Server should be asking for a name
-    cout << "Servidor:" << buffer << endl;
-    cin >> buffer;
-
-    if( write(TCPclient.socket_desc , buffer , MSGBUFSIZE) < 0)
-    {
-        cout << "Fallo en WRITE" << endl;
-        return 1;
-    }
-    cout << "Mensaje enviado al servidor" << endl;
-    */
-
     return 0;
 }
 
@@ -245,20 +217,8 @@ int socketHelper::sh_setMCGroup(){
 	return 0;
 }
 
-int socketHelper::sh_recvStateLoop(){
-/*
-	char buffer[MSGBUFSIZE];
+int socketHelper::sh_recvState(){
 
-     while (1) {
-	  addrlen=sizeof(addr);
-	  if ((nbytes=recvfrom(socket_desc,buffer,MSGBUFSIZE,0,
-			(struct sockaddr *) &addr,&addrlen)) < 0) {
-			cout << "recvfrom" << endl;
-	       exit(1);
-	  }
-	  cout << buffer << endl;
-     }*/
-     //initNcurses();
      while (1) {
 	  addrlen=sizeof(addr);
 	  if ((nbytes=recvfrom(socket_desc,gl,sizeof(game_logic),0,
@@ -272,22 +232,8 @@ int socketHelper::sh_recvStateLoop(){
      }
 }
 
-int socketHelper::sh_sendStateLoop(){
-	/*int i = 0;
-	char buffer[MSGBUFSIZE];
+int socketHelper::sh_sendState(){
 
-     while (1) {
-	  sprintf(buffer,"Multicast #%d",i);
-	  cout << buffer << endl;
-	  if (sendto(socket_desc,buffer,sizeof(buffer),0,(struct sockaddr *) &addr,
-		     sizeof(addr)) < 0) {
-	       cout << "Fallo en SENDTO" << endl;
-	       exit(1);
-	  }
-	  i++;
-	  sleep(2);
-     }
-     */
      while (1) {
 	  if (sendto(socket_desc,gl,sizeof(game_logic),0,(struct sockaddr *) &addr,
 		     sizeof(addr)) < 0) {
@@ -332,17 +278,6 @@ void *connection_handler(void *params)
         read(sock,dir,sizeof(*dir));
         cout << "El cliente " << id_player <<" presiono:" << *dir << endl;
     }
-    /*
-    while(1){
-
-		strcpy(buffer,"TCP server says bye!");
-		write(sock, buffer, MSGBUFSIZE);
-
-		read(sock, buffer,MSGBUFSIZE);
-		cout << "CliTCP:" << buffer << endl;
-
-		usleep(NAP_TCP);
-	}*/
 
     //Free the socket pointer
     free(&sock);
@@ -368,20 +303,6 @@ void *connection_handler_client(void *socket_desc)
             write(sock, &key , sizeof(key));
 		}
 	}
-	/*
-
-	char buffer[MSGBUFSIZE];
-
-    while(1){
-		read(sock, buffer , MSGBUFSIZE);
-		cout << "ServTCP:" << buffer << endl;
-		time_t seconds;
-		seconds = time(0);
-		sprintf(buffer,"TCP client says something! in %ld", seconds);
-		write(sock, buffer, MSGBUFSIZE);
-
-		//sleep(NAP_TCP)
-	}*/
 
     //Free the socket pointer
     free(socket_desc);

@@ -191,3 +191,13 @@ void game_logic::setSync(int pos, int val)
 {
     this->sync[pos] = val;
 }
+
+int game_logic::getNumPlayers()
+{
+    return this->num_players;
+}
+
+void game_logic::setNumPlayers(int val)
+{
+    this->num_players = val;
+}

@@ -32,11 +32,26 @@ struct threadParams {
 
 class socketHelper {
 	public:
-		bool type;
+		socketHelper(bool protocol, game_logic *g);
+		socketHelper(const char *ipaddress, bool protocol, game_logic *g);
+
+		int sh_bind();
+		void sh_listen();
+
+		//TCP methods
+		int sh_accept();
+		int sh_connect();
+
+		//UDP methods
+		int sh_setMCGroup();
+		int sh_recvState();
+		int sh_sendState();
+
+    private:
+        bool type;
 		struct sockaddr_in addr;
 		struct sockaddr_in client;
 		struct ip_mreq mreq;
-		int num_players;
 		int socket_desc;
 		int new_socket; //suspect
 		int *new_sock; 	//suspect
@@ -46,21 +61,6 @@ class socketHelper {
 		const char *message;	//suspect
         // game logic
 		game_logic *gl;
-
-		socketHelper(bool protocol, game_logic *g);
-		socketHelper(const char *ipaddress, bool protocol, game_logic *g);
-
-		void sh_setNumPlayers(int num);
-		int sh_bind();
-		void sh_listen();
-		int sh_acceptLoop();
-		int sh_connect();
-		int sh_setMCGroup();
-
-		/* test */
-		int sh_recvStateLoop();
-		int sh_sendStateLoop();
-
 
 };
 
