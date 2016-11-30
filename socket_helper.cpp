@@ -180,6 +180,22 @@ int socketHelper::sh_connect() {
 
     cout << "CONNECT listo" << endl;
 
+    char buffer[MSGBUFSIZE];
+
+    //Server should be asking for a name
+    read(socket_desc, buffer , MSGBUFSIZE);
+    cout << buffer << endl;
+    cin >> buffer;
+    write(socket_desc, buffer, MSGBUFSIZE);
+
+	//Time is sent for sync purpose
+	time_t seconds;
+	seconds = time(0);
+	sprintf(buffer,"%ld", seconds);
+	write(socket_desc, buffer, MSGBUFSIZE);
+
+    initNcurses();
+
     pthread_t client_thread;
 	//new_sock = (int *)malloc(1);
 	//*new_sock = new_socket;
@@ -240,7 +256,7 @@ int socketHelper::sh_recvStateLoop(){
 	  }
 	  cout << buffer << endl;
      }*/
-     initNcurses();
+     //initNcurses();
      while (1) {
 	  addrlen=sizeof(addr);
 	  if ((nbytes=recvfrom(socket_desc,gl,sizeof(game_logic),0,
@@ -248,6 +264,7 @@ int socketHelper::sh_recvStateLoop(){
 			cout << "recvfrom" << endl;
 	       exit(1);
 	  }
+	  clear();
 	  gl->draw();
 	  refresh();
      }
@@ -275,7 +292,7 @@ int socketHelper::sh_sendStateLoop(){
 	       cout << "Fallo en SENDTO" << endl;
 	       exit(1);
 	  }
-	  sleep(2);
+	  usleep(NAP_UDP);
      }
 
      return 0;
@@ -315,7 +332,7 @@ void *connection_handler(void *params)
 		read(sock, buffer,MSGBUFSIZE);
 		cout << "CliTCP:" << buffer << endl;
 
-		sleep(NAP_TCP);
+		usleep(NAP_TCP);
 	}
 
     //Free the socket pointer
@@ -332,8 +349,9 @@ void *connection_handler_client(void *socket_desc)
     //Get the socket descriptor
     int sock = *(int*)socket_desc;
 
-    char buffer[MSGBUFSIZE];
 
+    char buffer[MSGBUFSIZE];
+/*
     //Server should be asking for a name
     read(sock, buffer , MSGBUFSIZE);
     cout << buffer << endl;
@@ -345,7 +363,7 @@ void *connection_handler_client(void *socket_desc)
 	seconds = time(0);
 	sprintf(buffer,"%ld", seconds);
 	write(sock, buffer, MSGBUFSIZE);
-
+    */
     while(1){
 		read(sock, buffer , MSGBUFSIZE);
 		cout << "ServTCP:" << buffer << endl;

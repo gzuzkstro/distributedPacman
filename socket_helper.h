@@ -19,7 +19,8 @@
 #define NUM_CONN 2
 #define PAC_GROUP "225.0.0.38"
 #define MSGBUFSIZE 256
-#define NAP_TCP 4
+#define NAP_TCP 50000
+#define NAP_UDP 50000
 
 using namespace std;
 
