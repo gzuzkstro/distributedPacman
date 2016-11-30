@@ -324,6 +324,12 @@ void *connection_handler(void *params)
     cout << "La diferencia es: " << *dif << endl;
     sleep(3);
 
+    int key_client;
+    while(1){
+        read(sock,&key_client,sizeof(key_client));
+        cout << "Cliente presiono:" << key_client << endl;
+    }
+    /*
     while(1){
 
 		strcpy(buffer,"TCP server says bye!");
@@ -333,7 +339,7 @@ void *connection_handler(void *params)
 		cout << "CliTCP:" << buffer << endl;
 
 		usleep(NAP_TCP);
-	}
+	}*/
 
     //Free the socket pointer
     free(&sock);
@@ -348,35 +354,27 @@ void *connection_handler_client(void *socket_desc)
 {
     //Get the socket descriptor
     int sock = *(int*)socket_desc;
+    int key;
 
+    while(1){
+        key = getch();
+		cout << "tecla:" << key << endl;
+		write(sock, &key , sizeof(key));
+	}
+	/*
 
-    char buffer[MSGBUFSIZE];
-/*
-    //Server should be asking for a name
-    read(sock, buffer , MSGBUFSIZE);
-    cout << buffer << endl;
-    cin >> buffer;
-    write(sock, buffer, MSGBUFSIZE);
+	char buffer[MSGBUFSIZE];
 
-	//Time is sent for sync purpose
-	time_t seconds;
-	seconds = time(0);
-	sprintf(buffer,"%ld", seconds);
-	write(sock, buffer, MSGBUFSIZE);
-    */
     while(1){
 		read(sock, buffer , MSGBUFSIZE);
 		cout << "ServTCP:" << buffer << endl;
-
-
-		/* Getting time to later sync */
 		time_t seconds;
 		seconds = time(0);
 		sprintf(buffer,"TCP client says something! in %ld", seconds);
 		write(sock, buffer, MSGBUFSIZE);
 
 		//sleep(NAP_TCP)
-	}
+	}*/
 
     //Free the socket pointer
     free(socket_desc);
