@@ -13,14 +13,20 @@
 #include <cstdlib>
 #include <string.h>
 #include <unistd.h>
+#include "game_logic.h"
 
-#define PAC_PORT 12345
+#define PAC_PORT 12445
 #define NUM_CONN 2
-#define PAC_GROUP "225.0.0.37"
+#define PAC_GROUP "225.0.0.38"
 #define MSGBUFSIZE 256
 #define NAP_TCP 4
 
 using namespace std;
+
+struct threadParams {
+	int *dif;
+	int *sock;
+};
 
 class socketHelper {
 	public:
@@ -36,10 +42,12 @@ class socketHelper {
 		unsigned int addrlen;	//suspect
 		char msgbuf[MSGBUFSIZE];	//should be 2D?
 		const char *message;	//suspect
+		int sync[NUM_CONN];
+        // game logic
+		game_logic *gl;
 
-
-		socketHelper(bool protocol);
-		socketHelper(const char *ipaddress, bool protocol);
+		socketHelper(bool protocol, game_logic *g);
+		socketHelper(const char *ipaddress, bool protocol, game_logic *g);
 
 		void sh_setNumPlayers(int num);
 		int sh_bind();
@@ -51,6 +59,8 @@ class socketHelper {
 		/* test */
 		int sh_recvStateLoop();
 		int sh_sendStateLoop();
+
+
 };
 
 void *connection_handler(void *);
