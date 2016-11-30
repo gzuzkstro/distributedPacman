@@ -9,6 +9,17 @@
 #define Y_INFO 5
 #define NUM_CONN 2
 
+#define PACMAN 'C'
+#define PACDOT '.'
+#define CELL_W '_'
+#define POWERP 'o'
+#define CELL_E ' '
+#define CELL_B '-'
+#define PINKY 'P'
+#define CLYDE 'K'
+#define INKY 'I'
+#define BLINKY 'B'
+
 using namespace std;
 
 void initNcurses();
@@ -21,6 +32,7 @@ class game_logic
         void print_map(char c,int x,int y);
         void draw();
         void print_info();
+        void nextState();
         char* acum_str(int n);
         void setAcum(int n);
         int getAcum();
@@ -85,6 +97,9 @@ class game_logic
         int dirs[NUM_CONN];   // arreglo de la ultima tecla precionada por cada jugador
         int sync[NUM_CONN];   // eso era para hacer el manejo de las cuestinoes del tiempo
         int num_players;      // Num de jugadores
+
+        int aux;
+        int daux;
 };
 
 #endif // GAME_LOGIC_H

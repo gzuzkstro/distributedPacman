@@ -2,6 +2,7 @@
 
 game_logic::game_logic()
 {
+    aux = 10;
 	_x= 0;
 	_y= 0;
 	pts = 0;
@@ -48,34 +49,34 @@ void game_logic::print_map(char c,int x,int y)
 {
     switch(c)
 {
-	case '.':
+	case PACDOT:
         attron(COLOR_PAIR(1));
 		break;
-	case 'P':
+	case PACMAN:
         attron(COLOR_PAIR(1));
 		break;
-	case '_':
+	case CELL_W:
         attron(COLOR_PAIR(2));
 		break;
-	case ' ':
+	case CELL_E:
         attron(COLOR_PAIR(9));
 		break;
-	case '-':
+	case CELL_B:
         attron(COLOR_PAIR(8));
 		break;
-    case 'o':
+    case POWERP:
         attron(COLOR_PAIR(8));
 		break;
-    case 'F':
+    case PINKY:
         attron(COLOR_PAIR(3));
 		break;
-    case 'G':
+    case INKY:
         attron(COLOR_PAIR(4));
 		break;
-    case 'M':
+    case BLINKY:
         attron(COLOR_PAIR(5));
 		break;
-    case 'N':
+    case CLYDE:
         attron(COLOR_PAIR(6));
 		break;
 }
@@ -117,6 +118,19 @@ void game_logic::draw()
         }
     }
     print_info();
+}
+
+// Calculo del estado del juego
+void game_logic::nextState()
+{
+    if (aux == 20)
+        daux = -1;
+    else if ( aux == 10 )
+        daux = 1;
+    aux+= daux;
+    mapa[aux-1][10] = CELL_W;
+    mapa[aux][10] = PACMAN;
+
 }
 
 

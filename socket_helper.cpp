@@ -234,7 +234,16 @@ int socketHelper::sh_recvState(){
 
 int socketHelper::sh_sendState(){
 
+    bool flag = TRUE;
+
      while (1) {
+
+      if (flag) {
+        gl->nextState();
+        flag = FALSE;
+      } else
+        flag = TRUE;
+
 	  if (sendto(socket_desc,gl,sizeof(game_logic),0,(struct sockaddr *) &addr,
 		     sizeof(addr)) < 0) {
 	       cout << "Fallo en SENDTO" << endl;
