@@ -138,13 +138,15 @@ int socketHelper::sh_acceptLoop(){
 
         /* legacy code */
         pthread_t sniffer_thread;
-        new_sock = (int *)malloc(1);
-        *new_sock = new_socket;
+        /*new_sock = (int *)malloc(1);
+        *new_sock = new_socket;*/
 
         params = (struct threadParams *)malloc(sizeof(struct threadParams));
-        params->dif = &sync[conn_count];
         params->sock = (int *)malloc(1);
         *(params->sock) = new_socket;
+        params->dir = gl->getDir(conn_count);
+        params->dif = gl->getSync(conn_count);
+        params->id_player = conn_count;
 
         //if( pthread_create( &sniffer_thread , NULL ,  connection_handler , (void*) new_sock) < 0)
         if( pthread_create( &sniffer_thread , NULL ,  connection_handler , (void*)params) < 0)
@@ -307,6 +309,8 @@ void *connection_handler(void *params)
     struct threadParams *context = (struct threadParams *)params;
 	int sock = *(int*)context->sock;
 	int *dif = context->dif;
+    int *dir = context->dir;
+    int id_player = context->id_player;
     char buffer[MSGBUFSIZE];
 
     //User should be sending a name
@@ -324,10 +328,9 @@ void *connection_handler(void *params)
     cout << "La diferencia es: " << *dif << endl;
     sleep(3);
 
-    int key_client;
     while(1){
-        read(sock,&key_client,sizeof(key_client));
-        cout << "Cliente presiono:" << key_client << endl;
+        read(sock,dir,sizeof(*dir));
+        cout << "El cliente " << id_player <<" presiono:" << *dir << endl;
     }
     /*
     while(1){

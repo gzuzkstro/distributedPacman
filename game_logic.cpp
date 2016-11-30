@@ -171,3 +171,23 @@ char game_logic::getCell(int x, int y)
 {
     return this->mapa[x][y];
 }
+
+int *game_logic::getDir(int pos)
+{
+    return &(this->dirs[pos]);
+}
+
+void game_logic::setDir(int pos, int val)
+{
+    this->dirs[pos] = val;
+}
+
+int *game_logic::getSync(int pos)
+{
+    return &(this->sync[pos]);
+}
+
+void game_logic::setSync(int pos, int val)
+{
+    this->sync[pos] = val;
+}

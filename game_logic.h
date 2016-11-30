@@ -7,6 +7,7 @@
 #define MAXACUM 10
 #define X_INFO 40
 #define Y_INFO 5
+#define NUM_CONN 2
 
 using namespace std;
 
@@ -31,6 +32,10 @@ class game_logic
         int getPacts();
         void setCell(int x, int y, char c);
         char getCell(int x, int y);
+        int *getDir(int pos);
+        void setDir(int pos, int val);
+        int *getSync(int pos);
+        void setSync(int pos, int val);
     protected:
     private:
         // Mapa del juego
@@ -75,8 +80,8 @@ class game_logic
         int vidas;  // vidas de pacman
         int acum;   // pacdocts acumulados para activar el poder
         int pacts;  // pacdots consumidos
-
-
+        int dirs[NUM_CONN];   // arreglo de la ultima tecla precionada por cada jugador
+        int sync[NUM_CONN];   // eso era para hacer el manejo de las cuestinoes del tiempo
 };
 
 #endif // GAME_LOGIC_H

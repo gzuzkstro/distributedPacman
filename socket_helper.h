@@ -16,7 +16,6 @@
 #include "game_logic.h"
 
 #define PAC_PORT 12445
-#define NUM_CONN 2
 #define PAC_GROUP "225.0.0.38"
 #define MSGBUFSIZE 256
 #define NAP_TCP 50000
@@ -27,6 +26,8 @@ using namespace std;
 struct threadParams {
 	int *dif;
 	int *sock;
+	int *dir;
+	int id_player;
 };
 
 class socketHelper {
@@ -43,7 +44,6 @@ class socketHelper {
 		unsigned int addrlen;	//suspect
 		char msgbuf[MSGBUFSIZE];	//should be 2D?
 		const char *message;	//suspect
-		int sync[NUM_CONN];
         // game logic
 		game_logic *gl;
 
