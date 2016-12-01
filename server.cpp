@@ -38,6 +38,5 @@ int main(int argc, char** argv){
     socketHelper UDPserver(false, gl);
     UDPserver.sh_sendState();
 
-    sleep(100);
 	return 0;
 }

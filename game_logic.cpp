@@ -9,7 +9,6 @@ game_logic::game_logic()
     game_status = 0;
     poderes[0] = 0;
     poderes[1] = 0;
-
 }
 
 game_logic::~game_logic()
@@ -114,7 +113,9 @@ void game_logic::print_info()
     mvprintw(Y_INFO, X_INFO, "%s: %d","score", pts);
     mvprintw(Y_INFO + 2, X_INFO, "%s: %d","lives", vidas);
     if (acum >= 10)
-        mvprintw(Y_INFO + 4, X_INFO, "activar poder en \"p\": %s", acum_str(acum));
+        mvprintw(Y_INFO + 4, X_INFO, "Activar poder en \"p\": %s", acum_str(acum));
+        if (poderActivo(0))
+            mvprintw(Y_INFO + 5, X_INFO, "AHORA PACMAN PUEDE COMER FANTASMAS wuuuu");
     else
         mvprintw(Y_INFO + 4, X_INFO, "pacts acumulados: %s", acum_str(acum));
 
@@ -127,9 +128,10 @@ void game_logic::print_info()
         mvprintw(Y_INFO + 8, X_INFO, "%s","PACMAN PIERDE :( , Mejor suerte la proxima >:-P");
 
     // imprimir direcciones
+    /*
         for (int j = 0 ; j < NUM_CONN ; j++)
             mvprintw(Y_INFO + 14 + j, X_INFO, "%s %d - %d","dir y olddir", dirs[j],old_dirs[j]);
-
+    */
 }
 
 void game_logic::draw()
@@ -283,6 +285,15 @@ void game_logic::asignarPos(int mov[5][2])
                     break;
             }
         } else {
+
+            //Garantiza distintas velocidades de los fantasmas
+            if(delay_fantasma[i]>0){
+                delay_fantasma[i]--;
+                continue;
+            } else {
+                delay_fantasma[i] = i;
+            }
+
             if (mapa[ny][nx] == CELL_W) {
                 if (mapa[o_ny][o_nx] == CELL_W)
                     continue;

@@ -7,7 +7,7 @@
 #define MAXACUM 10
 #define X_INFO 40
 #define Y_INFO 5
-#define NUM_CONN 2
+#define NUM_CONN 5
 #define MAX_CONN 5
 
 #define PACMAN 'C'
@@ -139,6 +139,7 @@ class game_logic
         // 0: indica que el juego continua | 1: indica que pacman gana | -1: indica que pacman pierde
         int game_status;
         int poderes[2];
+        int delay_fantasma[MAX_CONN];
 };
 
 #endif // GAME_LOGIC_H
