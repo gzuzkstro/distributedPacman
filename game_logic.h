@@ -35,7 +35,7 @@
 #define PACS_MAP 244
 #define MAX_X 30
 #define MAX_Y 30
-
+#define PACPTS 10
 
 using namespace std;
 
@@ -119,9 +119,6 @@ class game_logic
                                         {POS_Y_PINKY,POS_X_PINKY},
                                         {POS_Y_INKY,POS_X_INKY},
                                         {POS_Y_CLYDE,POS_X_CLYDE}};
-
-        int aux;
-        int daux;
 };
 
 #endif // GAME_LOGIC_H

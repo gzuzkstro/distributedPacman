@@ -2,15 +2,11 @@
 
 game_logic::game_logic()
 {
-    aux = 10;
 	pts = 0;
     vidas = 3;
     acum = 0;
     pacts = 0;
 
-    // Agregar jugadores al mapa
-    for (int i = 0 ; i < NUM_CONN ; i++)
-        mapa[pos_players[i][0]][pos_players[i][1]] = char_players[i];
 }
 
 game_logic::~game_logic()
@@ -106,6 +102,8 @@ void game_logic::print_info()
         mvprintw(Y_INFO + 4, X_INFO, "activar poder en \"p\": %s", acum_str(acum));
     else
         mvprintw(Y_INFO + 4, X_INFO, "pacts acumulados: %s", acum_str(acum));
+
+    mvprintw(Y_INFO + 6, X_INFO, "%s: %d","pacts", pacts);
 }
 
 void game_logic::draw()
@@ -162,9 +160,31 @@ void game_logic::asignarPos(int mov[5][2])
         int ny = *y + mov[i][0];
         int nx = *x + mov[i][1];
 
-        if (mapa[ny][nx] == CELL_W || (mapa[ny][nx])) {
+        if (i == 0) {
+            switch(mapa[ny][nx])
+            {
+                case CELL_W:
+                case CELL_B:
+                    continue;
+                    break;
+                case PACDOT:
+                    mapa[ny][nx] = CELL_E;
+                    pts += PACPTS;
+                    acum++;
+                    pacts++;
+                    break;
+                case POWERP:
+                    mapa[ny][nx] = CELL_E;
+                    pts += PACPTS*2;
+                    pacts++;
+                    break;
+            }
+        } else {
 
         }
+        // Se actualiza la posicion
+        *y = ny;
+        *x = nx;
     }
 }
 
