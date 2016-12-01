@@ -138,6 +138,7 @@ int socketHelper::sh_acceptLoop(){
         pthread_t sniffer_thread;
         new_sock = (int *)malloc(1);
         *new_sock = new_socket;
+        /* ---------- */
         
         params = (struct threadParams *)malloc(sizeof(struct threadParams));
         params->dif = &sync[conn_count];
