@@ -160,6 +160,16 @@ void game_logic::asignarPos(int mov[5][2])
         int ny = *y + mov[i][0];
         int nx = *x + mov[i][1];
 
+        if (nx < 0) {
+            *x = 29;
+            continue;
+            }
+
+        if (nx > 29) {
+            *x = 0;
+            continue;
+            }
+
         if (i == 0) {
             switch(mapa[ny][nx])
             {
@@ -180,11 +190,50 @@ void game_logic::asignarPos(int mov[5][2])
                     break;
             }
         } else {
-
+            if (mapa[ny][nx] == CELL_W)
+                continue;
         }
         // Se actualiza la posicion
         *y = ny;
         *x = nx;
+    }
+}
+
+void game_logic::resetPos()
+{
+    pos_players[0][0] = POS_Y_PACMAN; pos_players[0][1] = POS_X_PACMAN;
+    pos_players[1][0] = POS_Y_BLINKY; pos_players[1][1] = POS_X_BLINKY;
+    pos_players[2][0] = POS_Y_PINKY; pos_players[2][1] = POS_X_PINKY;
+    pos_players[3][0] = POS_Y_INKY; pos_players[3][1] = POS_X_INKY;
+    pos_players[4][0] = POS_Y_CLYDE; pos_players[4][1] = POS_X_CLYDE;
+
+}
+
+void game_logic::endGame(bool s)
+{
+    attron(COLOR_PAIR(1));
+    if  (s)
+    {
+        mvprintw(Y_INFO + 8, X_INFO, "%s","PACMAN GANA !!!!");
+
+    } else
+    {
+        mvprintw(Y_INFO + 8, X_INFO, "%s","PACMAN PIERDE :( ");
+    }
+}
+
+void game_logic::compararPos()
+{
+    for (int i = 1 ; i < NUM_CONN ; i++) {
+        if (pos_players[i][0] == pos_players[0][0] && pos_players[i][1] == pos_players[0][1]) {
+            vidas--;
+            if ( vidas > 0) {
+                resetPos();
+            } else {
+               // endGame(FALSE);
+            }
+
+        }
     }
 }
 
@@ -203,6 +252,7 @@ void game_logic::nextState()
     int mov[5][2];
     calcularMov(mov);
     asignarPos(mov);
+    compararPos();
 
 }
 

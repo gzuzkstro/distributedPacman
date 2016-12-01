@@ -7,7 +7,7 @@
 #define MAXACUM 10
 #define X_INFO 40
 #define Y_INFO 5
-#define NUM_CONN 3
+#define NUM_CONN 2
 #define MAX_CONN 5
 
 #define PACMAN 'C'
@@ -69,6 +69,9 @@ class game_logic
         void setNumPlayers(int val);
         void calcularMov(int mov[5][2]);
         void asignarPos(int mov[5][2]);
+        void compararPos();
+        void resetPos();
+        void endGame(bool s);
     protected:
     private:
         // Mapa del juego
