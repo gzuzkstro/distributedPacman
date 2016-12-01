@@ -6,6 +6,7 @@ game_logic::game_logic()
     vidas = 3;
     acum = 0;
     pacts = 0;
+    game_status = 0;
 
 }
 
@@ -104,6 +105,13 @@ void game_logic::print_info()
         mvprintw(Y_INFO + 4, X_INFO, "pacts acumulados: %s", acum_str(acum));
 
     mvprintw(Y_INFO + 6, X_INFO, "%s: %d","pacts", pacts);
+
+    // Imprime si pacman gana o pierde segun el estatus del juego
+    if( game_status == 1)
+        mvprintw(Y_INFO + 8, X_INFO, "%s","PACMAN GANA !!!!");
+    else if (game_status == -1)
+        mvprintw(Y_INFO + 8, X_INFO, "%s","PACMAN PIERDE :( , Mejor suerte la proxima >:-P");
+
 }
 
 void game_logic::draw()
@@ -214,11 +222,10 @@ void game_logic::endGame(bool s)
     attron(COLOR_PAIR(1));
     if  (s)
     {
-        mvprintw(Y_INFO + 8, X_INFO, "%s","PACMAN GANA !!!!");
-
+        game_status = 1;
     } else
     {
-        mvprintw(Y_INFO + 8, X_INFO, "%s","PACMAN PIERDE :( ");
+        game_status = -1;
     }
 }
 
@@ -230,7 +237,7 @@ void game_logic::compararPos()
             if ( vidas > 0) {
                 resetPos();
             } else {
-               // endGame(FALSE);
+                endGame(FALSE);
             }
 
         }
@@ -240,15 +247,6 @@ void game_logic::compararPos()
 // Calculo del estado del juego
 void game_logic::nextState()
 {
-/*
-    if (aux == 20)
-        daux = -1;
-    else if ( aux == 10 )
-        daux = 1;
-    aux+= daux;
-    mapa[aux-1][10] = CELL_W;
-    mapa[aux][10] = PACMAN;
-*/
     int mov[5][2];
     calcularMov(mov);
     asignarPos(mov);

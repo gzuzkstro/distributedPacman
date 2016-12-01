@@ -122,6 +122,8 @@ class game_logic
                                         {POS_Y_PINKY,POS_X_PINKY},
                                         {POS_Y_INKY,POS_X_INKY},
                                         {POS_Y_CLYDE,POS_X_CLYDE}};
+        // 0: indica que el juego continua | 1: indica que pacman gana | -1: indica que pacman pierde
+        int game_status;
 };
 
 #endif // GAME_LOGIC_H
