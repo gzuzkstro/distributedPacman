@@ -13,27 +13,45 @@
 #include <cstdlib>
 #include <string.h>
 #include <unistd.h>
+#include "game_logic.h"
 
-#define PAC_PORT 12345
-#define NUM_CONN 2
-#define PAC_GROUP "225.0.0.37"
+#define PAC_PORT 12445
+#define PAC_GROUP "225.0.0.38"
 #define MSGBUFSIZE 256
-#define NAP_TCP 4
+#define NAP_TCP 100000
+#define NAP_UDP 200000
 
 using namespace std;
 
 struct threadParams {
 	int *dif;
 	int *sock;
+	int *dir;
+	int id_player;
 };
 
 class socketHelper {
 	public:
-		bool type;
+		socketHelper(bool protocol, game_logic *g);
+		socketHelper(const char *ipaddress, bool protocol, game_logic *g);
+
+		int sh_bind();
+		void sh_listen();
+
+		//TCP methods
+		int sh_accept();
+		int sh_connect();
+
+		//UDP methods
+		int sh_setMCGroup();
+		int sh_recvState();
+		int sh_sendState();
+
+    private:
+        bool type;
 		struct sockaddr_in addr;
 		struct sockaddr_in client;
 		struct ip_mreq mreq;
-		int num_players;
 		int socket_desc;
 		int new_socket; //suspect
 		int *new_sock; 	//suspect
@@ -41,21 +59,9 @@ class socketHelper {
 		unsigned int addrlen;	//suspect
 		char msgbuf[MSGBUFSIZE];	//should be 2D?
 		const char *message;	//suspect
-		int sync[NUM_CONN];
+        // game logic
+		game_logic *gl;
 
-		socketHelper(bool protocol);
-		socketHelper(const char *ipaddress, bool protocol);
-
-		void sh_setNumPlayers(int num);
-		int sh_bind();
-		void sh_listen();
-		int sh_acceptLoop();
-		int sh_connect();
-		int sh_setMCGroup();
-
-		/* test */
-		int sh_recvStateLoop();
-		int sh_sendStateLoop();
 };
 
 void *connection_handler(void *);

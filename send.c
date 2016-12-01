@@ -23,8 +23,9 @@ main(int argc, char *argv[])
      int fd, cnt;
      struct ip_mreq mreq;
      char message[256]="HW";
+     // OBJETO A ENVIAR
      game_logic *gl = new game_logic();
-     gl->setAcum(10);
+     //------------------------------
      printf("%d\n", gl->getAcum());
 
 
