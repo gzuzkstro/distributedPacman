@@ -315,7 +315,7 @@ void *connection_handler(void *params)
                 _x =1;
                 break;
         }
-
+        // Se que la nueva direccion no hace que se quede quieto
         if (!(mapa[pos_player[0]+_y][pos_player[1]+_x] == CELL_W))
             *old_dir = aux;
 

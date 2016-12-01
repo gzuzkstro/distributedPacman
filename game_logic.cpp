@@ -233,6 +233,25 @@ void game_logic::asignarPos(int mov[5][2])
             {
                 case CELL_W:
                 case CELL_B:
+
+                    if (!(mapa[o_ny][o_nx] == CELL_W || mapa[o_ny][o_nx] == CELL_B))
+                    {
+                        switch(mapa[o_ny][o_nx]){
+                            case PACDOT:
+                                mapa[o_ny][o_nx] = CELL_E;
+                                pts += PACPTS;
+                                acum++;
+                                pacts++;
+                                break;
+                            case POWERP:
+                                mapa[o_ny][o_nx] = CELL_E;
+                                pts += PACPTS*2;
+                                pacts++;
+                                break;
+                        }
+                        *y = o_ny;
+                        *x = o_nx;
+                    }
                     continue;
                     break;
                 case PACDOT:
@@ -256,11 +275,10 @@ void game_logic::asignarPos(int mov[5][2])
                     *x = o_nx;
                     continue;
                 }
-            } else {
-                old_dirs[i] = dirs[i];
             }
         }
         // Se actualiza la posicion
+        old_dirs[i] = dirs[i];
         *y = ny;
         *x = nx;
     }
