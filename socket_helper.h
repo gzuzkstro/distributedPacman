@@ -27,7 +27,10 @@ struct threadParams {
 	int *dif;
 	int *sock;
 	int *dir;
+	int *old_dir;
 	int id_player;
+	char (*mapa)[35];
+	int *pos_player;
 };
 
 class socketHelper {

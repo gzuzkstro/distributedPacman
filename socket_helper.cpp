@@ -137,9 +137,12 @@ int socketHelper::sh_accept(){
         params->sock = (int *)malloc(1);
         *(params->sock) = new_socket;
         params->dir = gl->getDir(conn_count);
+        params->old_dir = gl->getOldDir(conn_count);
         params->dif = gl->getSync(conn_count);
         params->id_player = conn_count;
-
+        //params->mapa = (char *)[35] malloc(sizeof(char *)[35]);
+        params->mapa = gl->getMap();
+        params->pos_player = gl->getPosArray(conn_count);
         //if( pthread_create( &sniffer_thread , NULL ,  connection_handler , (void*) new_sock) < 0)
         if( pthread_create( &sniffer_thread , NULL ,  connection_handler , (void*)params) < 0)
         {
@@ -265,8 +268,12 @@ void *connection_handler(void *params)
 	int sock = *(int*)context->sock;
 	int *dif = context->dif;
     int *dir = context->dir;
+    int *old_dir = context->old_dir;
+    char (*mapa)[35] = context->mapa;
     int id_player = context->id_player;
+    int *pos_player = context->pos_player;
     char buffer[MSGBUFSIZE];
+    int _y, _x;
 
     //User should be sending a name
     read(sock, buffer , MSGBUFSIZE);
@@ -282,10 +289,38 @@ void *connection_handler(void *params)
 	*dif = sec_server - sec_client;
     cout << "La diferencia es: " << *dif << endl;
     sleep(3);
+    int aux;
 
     while(1){
+        //if  (*old_dir == *dir)
+        aux = *dir;
         read(sock,dir,sizeof(*dir));
+
+        switch(aux)
+        {
+            case KEY_UP:
+                _y =-1;
+                _x =0;
+                break;
+            case KEY_DOWN:
+                _y =1;
+                _x =0;
+                break;
+            case KEY_LEFT:
+                _y =0;
+                _x =-1;
+                break;
+            case KEY_RIGHT:
+                _y =0;
+                _x =1;
+                break;
+        }
+
+        if (!(mapa[pos_player[0]+_y][pos_player[1]+_x] == CELL_W))
+            *old_dir = aux;
+
         cout << "El cliente " << id_player <<" presiono:" << *dir << endl;
+        cout << "La anterior fue :" << *old_dir << endl;
     }
 
     //Free the socket pointer

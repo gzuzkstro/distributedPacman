@@ -112,6 +112,10 @@ void game_logic::print_info()
     else if (game_status == -1)
         mvprintw(Y_INFO + 8, X_INFO, "%s","PACMAN PIERDE :( , Mejor suerte la proxima >:-P");
 
+    // imprimir direcciones
+        for (int j = 0 ; j < NUM_CONN ; j++)
+            mvprintw(Y_INFO + 14 + j, X_INFO, "%s %d - %d","dir y olddir", dirs[j],old_dirs[j]);
+
 }
 
 void game_logic::draw()
@@ -159,12 +163,58 @@ void game_logic::calcularMov(int mov[5][2])
     }
 }
 
+int game_logic::mov_y(int i)
+{
+    switch(old_dirs[i])
+        {
+            case KEY_UP:
+                return -1;
+                break;
+            case KEY_DOWN:
+                return 1;
+                break;
+            case KEY_LEFT:
+                return 0;
+                break;
+            case KEY_RIGHT:
+                return 0;
+                break;
+        }
+    return 0;
+}
+
+
+int game_logic::mov_x(int i)
+{
+    switch(old_dirs[i])
+        {
+            case KEY_UP:
+                return 0;
+                break;
+            case KEY_DOWN:
+                return 0;
+                break;
+            case KEY_LEFT:
+                return -1;
+                break;
+            case KEY_RIGHT:
+                return 1;
+                break;
+        }
+    return 0;
+}
+
+
 void game_logic::asignarPos(int mov[5][2])
 {
     for (int i = 0 ; i < NUM_CONN ; i++)
     {
         int *y = &(pos_players[i][0]);
         int *x = &(pos_players[i][1]);
+
+        int o_ny = *y + mov_y(i);
+        int o_nx = *x + mov_x(i);
+
         int ny = *y + mov[i][0];
         int nx = *x + mov[i][1];
 
@@ -198,8 +248,17 @@ void game_logic::asignarPos(int mov[5][2])
                     break;
             }
         } else {
-            if (mapa[ny][nx] == CELL_W)
-                continue;
+            if (mapa[ny][nx] == CELL_W) {
+                if (mapa[o_ny][o_nx] == CELL_W)
+                    continue;
+                else {
+                    *y = o_ny;
+                    *x = o_nx;
+                    continue;
+                }
+            } else {
+                old_dirs[i] = dirs[i];
+            }
         }
         // Se actualiza la posicion
         *y = ny;
@@ -244,6 +303,12 @@ void game_logic::compararPos()
     }
 }
 
+void game_logic::pacmanWin()
+{
+    if (pacts == PACS_MAP)
+        endGame(TRUE);
+}
+
 // Calculo del estado del juego
 void game_logic::nextState()
 {
@@ -251,7 +316,7 @@ void game_logic::nextState()
     calcularMov(mov);
     asignarPos(mov);
     compararPos();
-
+    pacmanWin();
 }
 
 
@@ -317,6 +382,16 @@ void game_logic::setDir(int pos, int val)
     this->dirs[pos] = val;
 }
 
+int *game_logic::getOldDir(int pos)
+{
+    return &(this->old_dirs[pos]);
+}
+
+void game_logic::setOldDir(int pos, int val)
+{
+    this->old_dirs[pos] = val;
+}
+
 int *game_logic::getSync(int pos)
 {
     return &(this->sync[pos]);
@@ -335,4 +410,14 @@ int game_logic::getNumPlayers()
 void game_logic::setNumPlayers(int val)
 {
     this->num_players = val;
+}
+
+char (*game_logic::getMap(void))[35]
+{
+    return this->mapa;
+}
+
+int *game_logic::getPosArray(int player)
+{
+    return this->pos_players[player];
 }

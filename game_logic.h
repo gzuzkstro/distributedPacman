@@ -63,15 +63,22 @@ class game_logic
         char getCell(int x, int y);
         int *getDir(int pos);
         void setDir(int pos, int val);
+        int *getOldDir(int pos);
+        void setOldDir(int pos, int val);
         int *getSync(int pos);
         void setSync(int pos, int val);
         int getNumPlayers();
         void setNumPlayers(int val);
         void calcularMov(int mov[5][2]);
         void asignarPos(int mov[5][2]);
+        int *getPosArray(int player);
         void compararPos();
         void resetPos();
         void endGame(bool s);
+        void pacmanWin();
+        int mov_y(int i);
+        int mov_x(int i);
+        char (*getMap(void))[35];
     protected:
     private:
         // Mapa del juego
@@ -113,6 +120,7 @@ class game_logic
         int vidas;  // vidas de pacman
         int acum;   // pacdocts acumulados para activar el poder
         int pacts;  // pacdots consumidos
+        int old_dirs[MAX_CONN] = {KEY_RIGHT,KEY_UP,KEY_UP,KEY_UP, KEY_UP}; // penultima tecla presionada por el usuario
         int dirs[MAX_CONN] = {KEY_RIGHT,KEY_UP,KEY_UP,KEY_UP, KEY_UP};   // arreglo de la ultima tecla precionada por cada jugador
         int sync[NUM_CONN];   // eso era para hacer el manejo de las cuestinoes del tiempo
         int num_players;      // Num de jugadores
