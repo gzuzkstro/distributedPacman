@@ -7,6 +7,8 @@ game_logic::game_logic()
     acum = 0;
     pacts = 0;
     game_status = 0;
+    poderes[0] = 0;
+    poderes[1] = 0;
 
 }
 
@@ -246,6 +248,7 @@ void game_logic::asignarPos(int mov[5][2])
                             case POWERP:
                                 mapa[o_ny][o_nx] = CELL_E;
                                 pts += PACPTS*2;
+                                poderes[0] = P1;
                                 pacts++;
                                 break;
                         }
@@ -262,6 +265,7 @@ void game_logic::asignarPos(int mov[5][2])
                     break;
                 case POWERP:
                     mapa[ny][nx] = CELL_E;
+                    poderes[0] = P1;
                     pts += PACPTS*2;
                     pacts++;
                     break;
@@ -310,14 +314,54 @@ void game_logic::compararPos()
 {
     for (int i = 1 ; i < NUM_CONN ; i++) {
         if (pos_players[i][0] == pos_players[0][0] && pos_players[i][1] == pos_players[0][1]) {
-            vidas--;
+
+            //PowerPellet esta en efecto
+            if(poderActivo(0)){
+                resetPosFantasma(i);
+            } else {
+                vidas--;
+            }
+
             if ( vidas > 0) {
-                resetPos();
+                //resetPos();
             } else {
                 endGame(FALSE);
             }
 
         }
+    }
+}
+
+void game_logic::contadorPoder(){
+    for(int i = 0; i<sizeof(poderes);i++){
+        if(poderes[i] > 0)
+            poderes[i]--;
+    }
+}
+
+bool game_logic::poderActivo(int i){
+    return (poderes[i]>0)? true:false;
+}
+
+void game_logic::resetPosFantasma(int i)
+{
+    switch(i){
+        case 1:
+            pos_players[i][0] = POS_Y_BLINKY;
+            pos_players[i][1] = POS_X_BLINKY;
+            break;
+        case 2:
+            pos_players[i][0] = POS_Y_PINKY;
+            pos_players[i][1] = POS_X_PINKY;
+            break;
+        case 3:
+            pos_players[i][0] = POS_Y_INKY;
+            pos_players[i][1] = POS_X_INKY;
+            break;
+        case 4:
+            pos_players[i][0] = POS_Y_CLYDE;
+            pos_players[i][1] = POS_Y_CLYDE;
+            break;
     }
 }
 
@@ -334,6 +378,7 @@ void game_logic::nextState()
     calcularMov(mov);
     asignarPos(mov);
     compararPos();
+    contadorPoder();
     pacmanWin();
 }
 

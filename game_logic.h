@@ -37,6 +37,9 @@
 #define MAX_Y 30
 #define PACPTS 10
 
+#define P1 30
+#define P2 10
+
 using namespace std;
 
 void initNcurses();
@@ -79,6 +82,9 @@ class game_logic
         int mov_y(int i);
         int mov_x(int i);
         char (*getMap(void))[35];
+        void resetPosFantasma(int i);
+        bool poderActivo(int i);
+        void contadorPoder();
     protected:
     private:
         // Mapa del juego
@@ -132,6 +138,7 @@ class game_logic
                                         {POS_Y_CLYDE,POS_X_CLYDE}};
         // 0: indica que el juego continua | 1: indica que pacman gana | -1: indica que pacman pierde
         int game_status;
+        int poderes[2];
 };
 
 #endif // GAME_LOGIC_H

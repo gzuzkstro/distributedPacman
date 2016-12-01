@@ -341,7 +341,7 @@ void *connection_handler_client(void *socket_desc)
 
     while(1){
         key = getch();
-        if  ( (key != key_old) && (key == KEY_UP || key == KEY_DOWN || key == KEY_LEFT || key == KEY_RIGHT) ) {
+        if  ( (key != key_old) && (key == KEY_UP || key == KEY_DOWN || key == KEY_LEFT || key == KEY_RIGHT || key == '1') ) {
             key_old = key;
             cout << "tecla:" << key << endl;
             write(sock, &key , sizeof(key));
