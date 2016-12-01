@@ -67,16 +67,28 @@ void game_logic::print_map(char c,int x,int y)
         attron(COLOR_PAIR(8));
 		break;
     case PINKY:
-        attron(COLOR_PAIR(3));
+        if(poderActivo(0)){
+            attron(COLOR_PAIR(8));
+        } else
+            attron(COLOR_PAIR(3));
 		break;
     case INKY:
-        attron(COLOR_PAIR(4));
+        if(poderActivo(0)){
+            attron(COLOR_PAIR(8));
+        } else
+            attron(COLOR_PAIR(4));
 		break;
     case BLINKY:
-        attron(COLOR_PAIR(5));
+        if(poderActivo(0)){
+            attron(COLOR_PAIR(8));
+        } else
+            attron(COLOR_PAIR(5));
 		break;
     case CLYDE:
-        attron(COLOR_PAIR(6));
+        if(poderActivo(0)){
+            attron(COLOR_PAIR(8));
+        } else
+            attron(COLOR_PAIR(6));
 		break;
 }
 
@@ -320,11 +332,10 @@ void game_logic::compararPos()
                 resetPosFantasma(i);
             } else {
                 vidas--;
+                resetPos();
             }
 
-            if ( vidas > 0) {
-                //resetPos();
-            } else {
+            if ( vidas == 0) {
                 endGame(FALSE);
             }
 
