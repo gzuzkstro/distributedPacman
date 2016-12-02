@@ -8,7 +8,7 @@ socketHelper::socketHelper(bool protocol, game_logic *g){
     this->gl = g;
 	type = protocol;
 
-	for(int i;i < gl->getNumPlayers();i++){
+	for(int i = 0;i < gl->getNumPlayers();i++){
         threadReady[i] = false;
     }
 
@@ -238,6 +238,9 @@ int socketHelper::sh_recvState(){
 	  clear();
 	  gl->draw();
 	  refresh();
+	  if(*(gl->getGameStatus())!=0){
+		  break;
+		  }
      }
 
      close(socket_desc);
@@ -248,7 +251,7 @@ int socketHelper::sh_sendState(){
 
     bool flag = TRUE;
 
-     while (1) {
+     while (true) {
 
       if (flag) {
         gl->nextState();
@@ -261,6 +264,12 @@ int socketHelper::sh_sendState(){
 	       cout << "Fallo en SENDTO" << endl;
 	       break;
 	  }
+	  
+	  if (*(gl->getGameStatus())!=0){
+		  cout << "Cerrado por el status" << endl;
+		  break;
+		  }
+	  
 	  usleep(NAP_UDP);
      }
 

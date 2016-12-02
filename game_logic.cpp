@@ -115,7 +115,7 @@ void game_logic::print_info()
     if (acum >= 10)
         mvprintw(Y_INFO + 4, X_INFO, "Activar poder en \"p\": %s", acum_str(acum));
         if (poderActivo(0))
-            mvprintw(Y_INFO + 5, X_INFO, "AHORA PACMAN PUEDE COMER FANTASMAS wuuuu");
+            mvprintw(Y_INFO + 5, X_INFO, "AHORA PACMAN PUEDE COMER FANTASMAS");
     else
         mvprintw(Y_INFO + 4, X_INFO, "pacts acumulados: %s", acum_str(acum));
 
@@ -125,7 +125,7 @@ void game_logic::print_info()
     if( game_status == 1)
         mvprintw(Y_INFO + 8, X_INFO, "%s","PACMAN GANA !!!!");
     else if (game_status == -1)
-        mvprintw(Y_INFO + 8, X_INFO, "%s","PACMAN PIERDE :( , Mejor suerte la proxima >:-P");
+        mvprintw(Y_INFO + 8, X_INFO, "%s","PACMAN PIERDE :(");
 
     // imprimir direcciones
     /*
