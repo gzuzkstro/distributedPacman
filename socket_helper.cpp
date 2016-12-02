@@ -146,6 +146,7 @@ int socketHelper::sh_accept(){
         params->dif = gl->getSync(conn_count);
         params->id_player = conn_count;
         params->ready = getThreadReady(conn_count);
+        params->poderes = gl->getPoderes();
 
         //params->mapa = (char *)[35] malloc(sizeof(char *)[35]);
         params->mapa = gl->getMap();
@@ -308,6 +309,7 @@ void *connection_handler(void *params)
     char (*mapa)[35] = context->mapa;
     int id_player = context->id_player;
     int *pos_player = context->pos_player;
+    int *poderes = context->poderes;
     char buffer[MSGBUFSIZE];
     int _y, _x;
 
@@ -336,13 +338,21 @@ void *connection_handler(void *params)
             break;
         }
 
-        aux = *dir;
-        if((read(sock,dir,sizeof(*dir)))<0){
+        if((read(sock,&aux,sizeof(aux)))<0){
             break;
         }
+        
+        //Si el fantasma intenta activar el poder se filtra
+        if(id_player!=0 && aux=='1'){
+			continue;
+		}
 
         switch(aux)
         {
+			//Activa el poder de invertir teclas
+			case '1':
+				poderes[1] = P2;
+				continue;
             case KEY_UP:
                 _y =-1;
                 _x =0;
@@ -360,11 +370,12 @@ void *connection_handler(void *params)
                 _x =1;
                 break;
         }
-        // Se que la nueva direccion no hace que se quede quieto
-        if (!(mapa[pos_player[0]+_y][pos_player[1]+_x] == CELL_W))
-            *old_dir = aux;
+        // La nueva direccion no hace que se quede quieto
+        if (!(mapa[pos_player[0]+_y][pos_player[1]+_x] == CELL_W)){
+			*old_dir = *dir;
+		}
 
-
+		*dir = aux;
 
         //cout << "El cliente " << id_player <<" presiono:" << *dir << endl;
         //cout << "La anterior fue :" << *old_dir << endl;
@@ -389,6 +400,7 @@ void *connection_handler_client(void *socket_desc)
 
     while(1){
         key = getch();
+        
         if  ( (key != key_old) && (key == KEY_UP || key == KEY_DOWN || key == KEY_LEFT || key == KEY_RIGHT || key == '1') ) {
             key_old = key;
             //cout << "tecla:" << key << endl;

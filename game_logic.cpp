@@ -7,7 +7,10 @@ game_logic::game_logic()
     acum = 0;
     pacts = 0;
     game_status = 0;
+    //PowerPellet
     poderes[0] = 0;
+    
+    //Controles invertidos para los fantasmas
     poderes[1] = 0;
 }
 
@@ -42,6 +45,10 @@ void initNcurses()
     clear();
 }
 
+int *game_logic::getPoderes()
+{
+	return poderes;
+}
 
 void game_logic::print_map(char c,int x,int y)
 {
@@ -114,12 +121,15 @@ void game_logic::print_info()
     mvprintw(Y_INFO + 2, X_INFO, "%s: %d","lives", vidas);
     if (acum >= 10)
         mvprintw(Y_INFO + 4, X_INFO, "Activar poder en \"p\": %s", acum_str(acum));
-        if (poderActivo(0))
-            mvprintw(Y_INFO + 5, X_INFO, "AHORA PACMAN PUEDE COMER FANTASMAS");
     else
         mvprintw(Y_INFO + 4, X_INFO, "pacts acumulados: %s", acum_str(acum));
+        
+    if (poderActivo(0))
+            mvprintw(Y_INFO + 5, X_INFO, "AHORA PACMAN PUEDE COMER FANTASMAS");
+    if (poderActivo(1))
+			mvprintw(Y_INFO + 6, X_INFO, "FANTASMAS ESTAN CONFUNDIDOS");
 
-    mvprintw(Y_INFO + 6, X_INFO, "%s: %d","pacts", pacts);
+    mvprintw(Y_INFO + 7, X_INFO, "%s: %d","pacts", pacts);
 
     // Imprime si pacman gana o pierde segun el estatus del juego
     if( game_status == 1)
@@ -228,11 +238,11 @@ void game_logic::asignarPos(int mov[5][2])
         int *y = &(pos_players[i][0]);
         int *x = &(pos_players[i][1]);
 
-        int o_ny = *y + mov_y(i);
-        int o_nx = *x + mov_x(i);
+        int o_ny = *y + mov_y(i)*((poderActivo(1) && i!=0)?-1:1);
+        int o_nx = *x + mov_x(i)*((poderActivo(1) && i!=0)?-1:1);
 
-        int ny = *y + mov[i][0];
-        int nx = *x + mov[i][1];
+        int ny = *y + mov[i][0]*((poderActivo(1) && i!=0)?-1:1);
+        int nx = *x + mov[i][1]*((poderActivo(1) && i!=0)?-1:1);
 
         if (nx < 0) {
             *x = 29;

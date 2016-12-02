@@ -86,6 +86,8 @@ class game_logic
         bool poderActivo(int i);
         void contadorPoder();
         int *getGameStatus();
+        int *getPoderes();
+        
     protected:
     private:
         // Mapa del juego

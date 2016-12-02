@@ -33,6 +33,7 @@ struct threadParams {
 	char (*mapa)[35];
 	int *pos_player;
 	bool *ready;
+	int *poderes;
 };
 
 class socketHelper {
