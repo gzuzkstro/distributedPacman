@@ -7,7 +7,7 @@
 #define MAXACUM 10
 #define X_INFO 40
 #define Y_INFO 5
-#define NUM_CONN 3
+#define NUM_CONN 5
 #define MAX_CONN 5
 
 #define PACMAN 'C'
@@ -35,7 +35,10 @@
 #define PACS_MAP 244
 #define MAX_X 30
 #define MAX_Y 30
+#define PACPTS 10
 
+#define P1 30
+#define P2 10
 
 using namespace std;
 
@@ -63,12 +66,26 @@ class game_logic
         char getCell(int x, int y);
         int *getDir(int pos);
         void setDir(int pos, int val);
+        int *getOldDir(int pos);
+        void setOldDir(int pos, int val);
         int *getSync(int pos);
         void setSync(int pos, int val);
         int getNumPlayers();
         void setNumPlayers(int val);
         void calcularMov(int mov[5][2]);
         void asignarPos(int mov[5][2]);
+        int *getPosArray(int player);
+        void compararPos();
+        void resetPos();
+        void endGame(bool s);
+        void pacmanWin();
+        int mov_y(int i);
+        int mov_x(int i);
+        char (*getMap(void))[35];
+        void resetPosFantasma(int i);
+        bool poderActivo(int i);
+        void contadorPoder();
+        int *getGameStatus();
     protected:
     private:
         // Mapa del juego
@@ -110,6 +127,7 @@ class game_logic
         int vidas;  // vidas de pacman
         int acum;   // pacdocts acumulados para activar el poder
         int pacts;  // pacdots consumidos
+        int old_dirs[MAX_CONN] = {KEY_RIGHT,KEY_UP,KEY_UP,KEY_UP, KEY_UP}; // penultima tecla presionada por el usuario
         int dirs[MAX_CONN] = {KEY_RIGHT,KEY_UP,KEY_UP,KEY_UP, KEY_UP};   // arreglo de la ultima tecla precionada por cada jugador
         int sync[NUM_CONN];   // eso era para hacer el manejo de las cuestinoes del tiempo
         int num_players;      // Num de jugadores
@@ -119,9 +137,10 @@ class game_logic
                                         {POS_Y_PINKY,POS_X_PINKY},
                                         {POS_Y_INKY,POS_X_INKY},
                                         {POS_Y_CLYDE,POS_X_CLYDE}};
-
-        int aux;
-        int daux;
+        // 0: indica que el juego continua | 1: indica que pacman gana | -1: indica que pacman pierde
+        int game_status;
+        int poderes[2];
+        int delay_fantasma[MAX_CONN];
 };
 
 #endif // GAME_LOGIC_H

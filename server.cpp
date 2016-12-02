@@ -33,11 +33,14 @@ int main(int argc, char** argv){
 	TCPserver.sh_listen();
 	TCPserver.sh_accept();
 
+    while(!TCPserver.allReady()){
+        sleep(1);
+    };
+
 	cout << "Ya está listo para comenzar el otro socket" << endl;
 	//After all connections are set up, the UPD multi-cast starts
     socketHelper UDPserver(false, gl);
     UDPserver.sh_sendState();
 
-    sleep(100);
 	return 0;
 }

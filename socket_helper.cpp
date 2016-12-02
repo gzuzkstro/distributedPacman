@@ -4,8 +4,13 @@
 //type: true(TCP), false(UDP)
 socketHelper::socketHelper(bool protocol, game_logic *g){
 
+
     this->gl = g;
 	type = protocol;
+
+	for(int i;i < gl->getNumPlayers();i++){
+        threadReady[i] = false;
+    }
 
 	//Creates socket based on type parameter
 	if(type){
@@ -136,9 +141,15 @@ int socketHelper::sh_accept(){
         params->sock = (int *)malloc(1);
         *(params->sock) = new_socket;
         params->dir = gl->getDir(conn_count);
+        params->gameStatus = gl->getGameStatus();
+        params->old_dir = gl->getOldDir(conn_count);
         params->dif = gl->getSync(conn_count);
         params->id_player = conn_count;
+        params->ready = getThreadReady(conn_count);
 
+        //params->mapa = (char *)[35] malloc(sizeof(char *)[35]);
+        params->mapa = gl->getMap();
+        params->pos_player = gl->getPosArray(conn_count);
         //if( pthread_create( &sniffer_thread , NULL ,  connection_handler , (void*) new_sock) < 0)
         if( pthread_create( &sniffer_thread , NULL ,  connection_handler , (void*)params) < 0)
         {
@@ -222,13 +233,15 @@ int socketHelper::sh_recvState(){
 	  addrlen=sizeof(addr);
 	  if ((nbytes=recvfrom(socket_desc,gl,sizeof(game_logic),0,
 			(struct sockaddr *) &addr,&addrlen)) < 0) {
-			cout << "recvfrom" << endl;
-	       exit(1);
+            break;
 	  }
 	  clear();
 	  gl->draw();
 	  refresh();
      }
+
+     close(socket_desc);
+     clear();
 }
 
 int socketHelper::sh_sendState(){
@@ -246,12 +259,28 @@ int socketHelper::sh_sendState(){
 	  if (sendto(socket_desc,gl,sizeof(game_logic),0,(struct sockaddr *) &addr,
 		     sizeof(addr)) < 0) {
 	       cout << "Fallo en SENDTO" << endl;
-	       exit(1);
+	       break;
 	  }
 	  usleep(NAP_UDP);
      }
 
+     close(socket_desc);
+     cout << "Cerrado el socket UDP" << endl;
+
      return 0;
+}
+
+bool socketHelper::allReady(){
+
+    for(int i=0;i<gl->getNumPlayers();i++){
+        if(threadReady[i]==false)
+            return false;
+    }
+    return true;
+}
+
+bool *socketHelper::getThreadReady(int i){
+    return &(threadReady[i]);
 }
 
 /*
@@ -264,8 +293,14 @@ void *connection_handler(void *params)
 	int sock = *(int*)context->sock;
 	int *dif = context->dif;
     int *dir = context->dir;
+    bool *ready = context->ready;
+    int *gameStatus = context->gameStatus;
+    int *old_dir = context->old_dir;
+    char (*mapa)[35] = context->mapa;
     int id_player = context->id_player;
+    int *pos_player = context->pos_player;
     char buffer[MSGBUFSIZE];
+    int _y, _x;
 
     //User should be sending a name
     read(sock, buffer , MSGBUFSIZE);
@@ -279,17 +314,57 @@ void *connection_handler(void *params)
     sec_server = time(0);
     int sec_client = atoi(buffer);
 	*dif = sec_server - sec_client;
-    cout << "La diferencia es: " << *dif << endl;
+    //cout << "La diferencia es: " << *dif << endl;
     sleep(3);
 
+    *ready = true;
+
+    int aux;
+
     while(1){
-        read(sock,dir,sizeof(*dir));
-        cout << "El cliente " << id_player <<" presiono:" << *dir << endl;
+
+        if(*gameStatus != 0){
+            break;
+        }
+
+        aux = *dir;
+        if((read(sock,dir,sizeof(*dir)))<0){
+            break;
+        }
+
+        switch(aux)
+        {
+            case KEY_UP:
+                _y =-1;
+                _x =0;
+                break;
+            case KEY_DOWN:
+                _y =1;
+                _x =0;
+                break;
+            case KEY_LEFT:
+                _y =0;
+                _x =-1;
+                break;
+            case KEY_RIGHT:
+                _y =0;
+                _x =1;
+                break;
+        }
+        // Se que la nueva direccion no hace que se quede quieto
+        if (!(mapa[pos_player[0]+_y][pos_player[1]+_x] == CELL_W))
+            *old_dir = aux;
+
+
+
+        //cout << "El cliente " << id_player <<" presiono:" << *dir << endl;
+        //cout << "La anterior fue :" << *old_dir << endl;
     }
 
-    //Free the socket pointer
-    free(&sock);
-
+    shutdown(sock,SHUT_RDWR);
+    while(read(sock,dir,sizeof(*dir)));
+    close(sock);
+    cout << "Socket cerrado" << endl;
     return 0;
 }
 
@@ -305,15 +380,21 @@ void *connection_handler_client(void *socket_desc)
 
     while(1){
         key = getch();
-        if  ( (key != key_old) && (key == KEY_UP || key == KEY_DOWN || key == KEY_LEFT || key == KEY_RIGHT) ) {
+        if  ( (key != key_old) && (key == KEY_UP || key == KEY_DOWN || key == KEY_LEFT || key == KEY_RIGHT || key == '1') ) {
             key_old = key;
-            cout << "tecla:" << key << endl;
-            write(sock, &key , sizeof(key));
+            //cout << "tecla:" << key << endl;
+            if((write(sock, &key , sizeof(key)))< 0){
+                break;
+            };
 		}
 	}
 
+    shutdown(sock,SHUT_RDWR);
+    while(read(sock,&key,sizeof(key)));
+    close(sock);
+    cout << "Socket cerrado" << endl;
     //Free the socket pointer
-    free(socket_desc);
+    //free(socket_desc);
 
     return 0;
 }
