@@ -27,10 +27,12 @@ struct threadParams {
 	int *dif;
 	int *sock;
 	int *dir;
+	int *gameStatus;
 	int *old_dir;
 	int id_player;
 	char (*mapa)[35];
 	int *pos_player;
+	bool *ready;
 };
 
 class socketHelper {
@@ -50,8 +52,12 @@ class socketHelper {
 		int sh_recvState();
 		int sh_sendState();
 
+        bool *getThreadReady(int i);
+		bool allReady();
+
     private:
         bool type;
+        bool threadReady[NUM_CONN];
 		struct sockaddr_in addr;
 		struct sockaddr_in client;
 		struct ip_mreq mreq;

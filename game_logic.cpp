@@ -333,6 +333,11 @@ void game_logic::endGame(bool s)
     }
 }
 
+int *game_logic::getGameStatus()
+{
+    return &game_status;
+}
+
 void game_logic::compararPos()
 {
     for (int i = 1 ; i < NUM_CONN ; i++) {

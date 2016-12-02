@@ -85,6 +85,7 @@ class game_logic
         void resetPosFantasma(int i);
         bool poderActivo(int i);
         void contadorPoder();
+        int *getGameStatus();
     protected:
     private:
         // Mapa del juego
